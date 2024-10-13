@@ -1,7 +1,7 @@
 // users.controller.ts
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UserRequestDTO, UserResponseDTO, ModifyUserDTO } from './dto/users.dto';
+import { UserRequestDTO, UserResponseDTO, ModifyUserDTO } from './dto/user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -31,7 +31,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: number): Promise<void> {
+  async remove(@Param('id') id: string): Promise<void> {
     return this.usersService.remove(id);
   }
 }
