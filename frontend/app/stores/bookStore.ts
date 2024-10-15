@@ -1,0 +1,80 @@
+import { makeAutoObservable, runInAction } from 'mobx';
+import apiClient from '@/app/utils/axios-instance';
+import { Book } from '@/app/models/types';
+
+class BookStore {
+  books: Book[] = [];
+  selectedBook: Book | null = null;
+  loading: boolean = false;
+
+  constructor() {
+    makeAutoObservable(this);
+  }
+
+  async fetchBooks() {
+    this.loading = true;
+    try {
+      const response = await apiClient.get('/books');
+      runInAction(() => {
+        this.books = response.data;
+      });
+    } catch (error) {
+      console.error('Error fetching books:', error);
+    } finally {
+      runInAction(() => {
+        this.loading = false;
+      });
+    }
+  }
+
+  async addBook(newBook: Book) {
+    try {
+      const response = await apiClient.post('/books', newBook);
+      runInAction(() => {
+        this.books.push(response.data);
+      });
+    } catch (error) {
+      console.error('Failed to add book:', error);
+    }
+  }
+
+  async updateBook(updatedBook: Book) {
+    try {
+      await apiClient.put(`/books/${updatedBook.id}`, updatedBook);
+      runInAction(() => {
+        const index = this.books.findIndex((book) => book.id === updatedBook.id);
+        if (index !== -1) {
+          this.books[index] = updatedBook;
+        }
+      });
+    } catch (error) {
+      console.error('Failed to update book:', error);
+    }
+  }
+
+  async deleteBook(id: string) {
+    try {
+      await apiClient.delete(`/books/${id}`);
+      runInAction(() => {
+        this.books = this.books.filter((book) => book.id !== id);
+      });
+    } catch (error) {
+      console.error('Failed to delete book:', error);
+    }
+  }
+
+  setSelectedBook(book: Book | null) {
+    this.selectedBook = book;
+  }
+
+  searchBooks(query: string) {
+    const lowerCaseQuery = query.toLowerCase();
+    return this.books.filter(
+      (book) =>
+        book.title.toLowerCase().includes(lowerCaseQuery) ||
+        book.author.toLowerCase().includes(lowerCaseQuery)
+    );
+  }
+}
+
+export const bookStore = new BookStore();

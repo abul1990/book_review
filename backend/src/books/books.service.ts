@@ -4,12 +4,15 @@ import { Repository } from 'typeorm';
 import { Book } from './entities/books.entity';
 import { BookRequestDto, BookResponseDto } from './dto/book.dto';
 import { plainToInstance } from 'class-transformer';
+import { RatingDistribution, ReviewResponseDto } from 'src/reviews/dto/review.dto';
+import { ReviewsService } from 'src/reviews/reviews.service';
 
 @Injectable()
 export class BooksService {
   constructor(
     @InjectRepository(Book)
     private readonly bookRepository: Repository<Book>,
+    private readonly reviewsService: ReviewsService,
   ) {}
 
   async create(bookDto: BookRequestDto): Promise<BookResponseDto> {
@@ -27,6 +30,14 @@ export class BooksService {
     const book = await this.bookRepository.findOne({ where: { id } });
     if (!book) throw new NotFoundException('Book not found');
     return this.toResponseDTO(book);
+  }
+
+  async getReviewsByBookId(bookId: string): Promise<ReviewResponseDto[]> {
+    return this.reviewsService.findByBookId(bookId);
+  }
+
+  async getDistributionRatingsByBookId(bookId: string): Promise<RatingDistribution[]> {
+    return this.reviewsService.getRatingDistribution(bookId);
   }
 
   async update(id: string, bookDto: BookRequestDto): Promise<BookResponseDto> {

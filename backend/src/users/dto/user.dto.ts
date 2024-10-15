@@ -1,4 +1,4 @@
-import { IsEmail, IsEnum, IsNotEmpty, Length } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsString, Length } from 'class-validator';
 import { UserRole } from '../entities/user-role.enum';
 
 export class UserRequestDTO {
@@ -28,3 +28,12 @@ export class UserResponseDTO {
     email: string;
     role: UserRole;
   }
+
+export class LoginDTO {
+  @IsEmail()
+  email: string;
+
+  @IsString()
+  password: string;
+}
+

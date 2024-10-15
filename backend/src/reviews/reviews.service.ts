@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Review } from './entities/reviews.entity';
-import { ReviewRequestDto, ReviewResponseDto, UpdateReviewDto } from './dto/review.dto';
+import { RatingDistribution, ReviewRequestDto, ReviewResponseDto, UpdateReviewDto } from './dto/review.dto';
 import { plainToInstance } from 'class-transformer';
 import { Book } from 'src/books/entities/books.entity';
 import { User } from 'src/users/entities/user.entity';
@@ -25,7 +25,7 @@ export class ReviewsService {
     if (!book) throw new NotFoundException('Book not found');
     if (!user) throw new NotFoundException('User not found');
 
-    const newReview = plainToInstance(Review, { ...reviewDto, book, user, reviewDate: new Date() });
+    const newReview = plainToInstance(Review, { ...reviewDto, book, user, createdAt: new Date() });
     const savedReview = await this.reviewRepository.save(newReview);
     return this.toResponseDTO(savedReview);
   }
@@ -39,6 +39,34 @@ export class ReviewsService {
     const review = await this.reviewRepository.findOne({ where: { id }, relations: ['book', 'user'] });
     if (!review) throw new NotFoundException('Review not found');
     return this.toResponseDTO(review);
+  }
+
+  async findByBookId(bookId: string): Promise<ReviewResponseDto[]> {
+    const reviews = await this.reviewRepository.find({ where: { book: { id: bookId } }, relations: ['book', 'user'] });
+    console.log('reviews => ', reviews);
+    return reviews.map(this.toResponseDTO);
+  }
+
+  async findByUserId(userId: string): Promise<ReviewResponseDto[]> {
+    const reviews = await this.reviewRepository.find({ where: { user: { id: userId } }, relations: ['book', 'user'] });
+    console.log('reviews => ', reviews);
+    return reviews.map(this.toResponseDTO);
+  }
+
+  async getRatingDistribution(bookId: string): Promise<RatingDistribution[]> {
+    const reviews = await this.reviewRepository.find({ where: { book: { id: bookId } } });
+    const ratingDistribution = Array(5).fill(0);
+
+    reviews.forEach(review => {
+      if (review.rating >= 1 && review.rating <= 5) {
+        ratingDistribution[review.rating - 1]++;
+      }
+    });
+
+    return ratingDistribution.map((count, index) => ({
+      rating: index + 1,
+      count,
+    }));
   }
 
   async update(id: string, updateDto: UpdateReviewDto): Promise<ReviewResponseDto> {
@@ -57,10 +85,12 @@ export class ReviewsService {
     return {
       id: review.id,
       rating: review.rating,
-      reviewText: review.reviewText,
-      reviewDate: review.reviewDate,
+      comment: review.comment,
+      createdAt: review.createdAt,
       bookId: review.book.id,
       userId: review.user.id,
+      book: review.book,
+      user: review.user,
     };
   }
 }

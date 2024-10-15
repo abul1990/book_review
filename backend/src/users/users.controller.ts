@@ -1,7 +1,8 @@
 // users.controller.ts
 import { Controller, Get, Post, Put, Delete, Param, Body } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { UserRequestDTO, UserResponseDTO, ModifyUserDTO } from './dto/user.dto';
+import { UserRequestDTO, UserResponseDTO, ModifyUserDTO, LoginDTO } from './dto/user.dto';
+import { ReviewResponseDto } from 'src/reviews/dto/review.dto';
 
 @Controller('users')
 export class UsersController {
@@ -33,5 +34,15 @@ export class UsersController {
   @Delete(':id')
   async remove(@Param('id') id: string): Promise<void> {
     return this.usersService.remove(id);
+  }
+
+  @Post('login')
+  async login(@Body() loginDTO: LoginDTO): Promise<UserResponseDTO> {
+    return this.usersService.login(loginDTO);
+  }
+
+  @Get(':id/reviews')
+  getReviews(@Param('id') id: string): Promise<ReviewResponseDto[]> {
+    return this.usersService.getReviewsByUserId(id);
   }
 }

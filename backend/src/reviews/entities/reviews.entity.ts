@@ -9,11 +9,12 @@ export class Review {
 
   @Column({ type: 'int', width: 1 })
   rating: number; 
+
   @Column({ length: 500 })
-  reviewText: string;
+  comment: string;
 
   @Column({ type: 'date' })
-  reviewDate: Date;
+  createdAt: Date;
 
   @ManyToOne(() => Book, (book) => book.reviews, { onDelete: 'CASCADE' })  
   @JoinColumn({ name: 'book_id' })  
