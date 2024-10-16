@@ -1,7 +1,6 @@
 'use client';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { createTheme, ThemeProvider as MuiThemeProvider, CssBaseline } from '@mui/material';
-import { PaletteMode } from '@mui/material';
 
 interface ThemeContextType {
   darkMode: boolean;

@@ -10,6 +10,7 @@ import {
   TextField,
   Button,
   Divider,
+  Rating,
 } from '@mui/material';
 import { reviewStore } from '@/app/stores/reviewStore';
 import { bookStore } from '@/app/stores/bookStore';
@@ -18,6 +19,7 @@ import ReviewCard from '@/app/components/ReviewCard';
 import { Review } from '@/app/models/types';
 import { useRatingDistribution } from '@/app/hooks/useRatingDistribution';
 import { userStore } from '@/app/stores/userStore';
+import Image from 'next/image';
 
 const getInitialReviewState = (bookId: string): Review => ({
   comment: '',
@@ -26,40 +28,19 @@ const getInitialReviewState = (bookId: string): Review => ({
   userId: userStore.loggedInUser?.id ?? '',
 });
 
-//@ts-ignore
-const StarRating = ({ rating, onChange }) => {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      {[1, 2, 3, 4, 5].map((star) => (
-        <Button
-          key={star}
-          onClick={() => onChange(star)}
-          sx={{
-            color: star <= rating ? 'gold' : 'gray',
-            fontSize: 24,
-          }}
-        >
-          ★
-        </Button>
-      ))}
-    </Box>
-  );
-};
-
 const ReviewsPage = observer(() => {
   const { selectedBook } = bookStore;
   const reviews = reviewStore.reviews;
 
   useEffect(() => {
-    if (selectedBook?.id) 
-      reviewStore.fetchReviewsByBook(selectedBook.id);
+    if (selectedBook?.id) reviewStore.fetchReviewsByBook(selectedBook.id);
   }, [selectedBook]);
 
   const [newReview, setNewReview] = useState<Review>(
     getInitialReviewState(selectedBook?.id || '')
   );
 
-  const { ratingDistribution, loading: distributionLoading } = 
+  const { ratingDistribution, loading: distributionLoading } =
     useRatingDistribution(selectedBook?.id ?? '');
 
   const handleAddReview = async () => {
@@ -68,7 +49,11 @@ const ReviewsPage = observer(() => {
   };
 
   if (!selectedBook) {
-    return <Typography variant="h6">Please select a book to view its reviews.</Typography>;
+    return (
+      <Typography variant="h6">
+        Please select a book to view its reviews.
+      </Typography>
+    );
   }
 
   if (reviewStore.loading) {
@@ -79,20 +64,26 @@ const ReviewsPage = observer(() => {
     <Box sx={{ padding: 3 }}>
       <Grid container spacing={2} alignItems="center" sx={{ marginBottom: 4 }}>
         <Grid item xs={12} sm={4}>
-          <img
-            src={selectedBook.coverUrl}
+          <Image
+            src={selectedBook.coverUrl ?? ''}
             alt={selectedBook.title}
             style={{ width: '100%', height: 'auto' }}
           />
         </Grid>
         <Grid item xs={12} sm={8}>
-          <Typography variant="h4" gutterBottom>{selectedBook.title}</Typography>
-          <Typography variant="h6" gutterBottom>by {selectedBook.author}</Typography>
+          <Typography variant="h4" gutterBottom>
+            {selectedBook.title}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            by {selectedBook.author}
+          </Typography>
         </Grid>
       </Grid>
+
       <Typography variant="h5" gutterBottom sx={{ marginTop: 4 }}>
         Customer Reviews
       </Typography>
+
       {distributionLoading ? (
         <CircularProgress />
       ) : (
@@ -100,13 +91,21 @@ const ReviewsPage = observer(() => {
       )}
 
       <Divider sx={{ margin: '12px 4px' }} />
+
       <Typography variant="h6" gutterBottom>
         Rate & Review
       </Typography>
 
-      <StarRating
-        rating={newReview.rating}
-        onChange={(rating: number) => setNewReview({ ...newReview, rating })}
+      <Rating
+        name="rating"
+        value={newReview.rating || 0}
+        precision={0.5}
+        onChange={(_, newValue) => {
+          if (newValue !== null) {
+            setNewReview({ ...newReview, rating: newValue });
+          }
+        }}
+        size="large"
       />
 
       <TextField
@@ -116,7 +115,9 @@ const ReviewsPage = observer(() => {
         variant="outlined"
         fullWidth
         value={newReview.comment}
-        onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
+        onChange={(e) =>
+          setNewReview({ ...newReview, comment: e.target.value })
+        }
         sx={{ marginBottom: 2 }}
       />
 
@@ -124,18 +125,16 @@ const ReviewsPage = observer(() => {
         Post Review
       </Button>
 
-        <Grid container spacing={2} mt={2}>
-      {reviews.map((review) => (
-        <Grid item xs={12} key={review.id}>
-          <ReviewCard
-            review={review}
-            isUserReview={review.userId === newReview.userId}
-            onEdit={(id) => console.log('Edit review:', id)}
-            onDelete={(id) => console.log('Delete review:', id)}
-          />
-        </Grid>
-      ))}
-    </Grid>
+      <Grid container spacing={2} mt={2}>
+        {reviews.map((review) => (
+          <Grid item xs={12} key={review.id}>
+            <ReviewCard
+              review={review}
+              isUserReview={review.userId === userStore.loggedInUser?.id}
+            />
+          </Grid>
+        ))}
+      </Grid>
     </Box>
   );
 });

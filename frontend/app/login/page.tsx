@@ -82,7 +82,7 @@ const LoginPage: React.FC = () => {
           </Grid>
           <Grid item xs={12} textAlign="center">
             <Typography variant="body2" color="textPrimary">
-              Don't have an account?{' '}
+              {"Don't have an account? "}
               <Link href="/register" underline="hover" color="primary">
                 Sign Up
               </Link>

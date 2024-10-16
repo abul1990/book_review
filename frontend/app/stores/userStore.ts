@@ -26,7 +26,7 @@ class UserStore {
       console.error('Failed to retrieve user from local storage:', error);
     }
   }
-  private isValidUser(user: any): user is User {
+  private isValidUser(user: User): user is User {
     return user && typeof user.email === 'string';
   }
 

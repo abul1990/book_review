@@ -55,7 +55,7 @@ class ReviewStore {
 
   async updateReview(id: string, updatedReview: Partial<Review>) {
     try {
-      await apiClient.put(`/reviews/${id}`, updatedReview);
+      await apiClient.patch(`/reviews/${id}`, updatedReview);
       runInAction(() => {
         const index = this.reviews.findIndex((review) => review.id === id);
         if (index !== -1) this.reviews[index] = { ...this.reviews[index], ...updatedReview };

@@ -19,6 +19,7 @@ import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import Image from 'next/image';
 
 const BookManagementPage = observer(() => {
   const [newBook, setNewBook] = useState<Book>({
@@ -28,7 +29,7 @@ const BookManagementPage = observer(() => {
     coverUrl: '',
     publicationDate: dayjs(new Date()).format('YYYY-MM-DD'),
   });
-  const [file, setFile] = useState<File | null>(null);
+  // const [file, setFile] = useState<File | null>(null);
 
   useEffect(() => {
     bookStore.fetchBooks();
@@ -67,7 +68,7 @@ const BookManagementPage = observer(() => {
       coverUrl: '',
       publicationDate: dayjs(new Date()).format('YYYY-MM-DD'),
     });
-    setFile(null);
+    // setFile(null);
   };
 
   const handleEditBook = (book: Book) => {
@@ -139,8 +140,8 @@ const BookManagementPage = observer(() => {
         {bookStore.books.map((book) => (
           <Grid item xs={12} sm={6} md={4} key={book.id}>
             <Card sx={{ display: 'flex', flexDirection: 'row', padding: 1 }}>
-              <img
-                src={book.coverUrl}
+              <Image
+                src={book.coverUrl ?? ''}
                 alt={book.title}
                 style={{ width: '150px', height: 'auto', borderRadius: '4px', marginRight: '16px' }}
               />
