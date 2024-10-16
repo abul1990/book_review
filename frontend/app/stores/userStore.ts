@@ -14,16 +14,18 @@ class UserStore {
   }
 
   private init() {
-    try {
-      const storedUser = localStorage.getItem('loggedInUser');
-      if (storedUser) {
-        const parsedUser = JSON.parse(storedUser);
-        if (this.isValidUser(parsedUser)) {
-          this.loggedInUser = parsedUser;
+    if(typeof window !== 'undefined') {
+      try {
+        const storedUser = localStorage.getItem('loggedInUser');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          if (this.isValidUser(parsedUser)) {
+            this.loggedInUser = parsedUser;
+          }
         }
+      } catch (error) {
+        console.error('Failed to retrieve user from local storage:', error);
       }
-    } catch (error) {
-      console.error('Failed to retrieve user from local storage:', error);
     }
   }
   private isValidUser(user: User): user is User {

@@ -18,7 +18,9 @@ const LoginPage: React.FC = () => {
     const success = await userStore.login(credentials);
     if (success) {
       document.cookie = `loggedInUser=${credentials.email}; path=/`;
-      localStorage.setItem('loggedInUser', JSON.stringify(userStore.loggedInUser));
+      if(typeof window !== 'undefined') {
+        localStorage.setItem('loggedInUser', JSON.stringify(userStore.loggedInUser));
+      }
       router.push('/');
     } else {
       alert('Invalid credentials!');
