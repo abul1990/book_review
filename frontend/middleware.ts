@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const loggedInUser = request.cookies.get('loggedInUser');
+  const token = request.cookies.get('access_token');
 
-  if (!loggedInUser) {
+  if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 

@@ -31,3 +31,10 @@ export interface RatingDistribution {
   rating: number;
   count: number;
 }
+
+export enum Role {
+  ADMIN = 'admin',
+  USER = 'user',
+}
+
+export const defaultBookCoverUrl = 'https://png.pngtree.com/png-vector/20240708/ourlarge/pngtree-book-cover-template-png-image_13030764.png';

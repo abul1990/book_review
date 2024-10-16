@@ -16,10 +16,11 @@ import { reviewStore } from '@/app/stores/reviewStore';
 import { bookStore } from '@/app/stores/bookStore';
 import RatingBars from '@/app/components/RatingBars';
 import ReviewCard from '@/app/components/ReviewCard';
-import { Review } from '@/app/models/types';
+import { defaultBookCoverUrl, Review } from '@/app/models/types';
 import { useRatingDistribution } from '@/app/hooks/useRatingDistribution';
 import { userStore } from '@/app/stores/userStore';
-import Image from 'next/image';
+import { useAuth } from '@/app/hooks/useAuth';
+import { formatDate } from '@/app/utils/date-formatter';
 
 const getInitialReviewState = (bookId: string): Review => ({
   comment: '',
@@ -29,6 +30,7 @@ const getInitialReviewState = (bookId: string): Review => ({
 });
 
 const ReviewsPage = observer(() => {
+  useAuth();
   const { selectedBook } = bookStore;
   const reviews = reviewStore.reviews;
 
@@ -64,10 +66,15 @@ const ReviewsPage = observer(() => {
     <Box sx={{ padding: 3 }}>
       <Grid container spacing={2} alignItems="center" sx={{ marginBottom: 4 }}>
         <Grid item xs={12} sm={4}>
-          <Image
-            src={selectedBook.coverUrl ?? ''}
+          <Box
+            component="img"
+            src={selectedBook.coverUrl || defaultBookCoverUrl}
             alt={selectedBook.title}
-            style={{ width: '100%', height: 'auto' }}
+            sx={{
+              width: '100%',
+              height: 'auto',
+              borderRadius: '4px',
+            }}
           />
         </Grid>
         <Grid item xs={12} sm={8}>
@@ -76,6 +83,9 @@ const ReviewsPage = observer(() => {
           </Typography>
           <Typography variant="h6" gutterBottom>
             by {selectedBook.author}
+          </Typography>
+          <Typography variant="h6" gutterBottom>
+            Published On: {formatDate(selectedBook.publicationDate)}
           </Typography>
         </Grid>
       </Grid>

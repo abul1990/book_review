@@ -12,14 +12,18 @@ import {
   CardContent,
   IconButton,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from '@mui/material';
 import { bookStore } from '@/app/stores/bookStore';
-import { Book } from '@/app/models/types';
+import { Book, defaultBookCoverUrl } from '@/app/models/types';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import Image from 'next/image';
+import { formatDate } from '@/app/utils/date-formatter';
 
 const BookManagementPage = observer(() => {
   const [newBook, setNewBook] = useState<Book>({
@@ -29,35 +33,25 @@ const BookManagementPage = observer(() => {
     coverUrl: '',
     publicationDate: dayjs(new Date()).format('YYYY-MM-DD'),
   });
-  // const [file, setFile] = useState<File | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
     bookStore.fetchBooks();
   }, []);
 
   const handleAddUpdateBook = async () => {
-    // if (file) {
-    //   const reader = new FileReader();
-    //   reader.onloadend = async () => {
-    //     if(newBook.id) {
-    //         await bookStore.updateBook({ ...newBook, coverUrl: reader.result as string });
-    //     } else {
-    //         await bookStore.addBook({ ...newBook, coverUrl: reader.result as string });
-    //     }
-    //     clearForm();
-    //   };
-    //   reader.readAsDataURL(file);
-    // } else {
-    //   await bookStore.addBook(newBook);
-    //   clearForm();
-    // }
+    if (!newBook.title || !newBook.author || !newBook.publicationDate) {
+      alert('Please fill out all required fields: Title, Author, and Publication Date.');
+      return;
+    }
 
-    if(newBook.id) {
-        await bookStore.updateBook(newBook);
+    if (newBook.id) {
+      await bookStore.updateBook(newBook);
     } else {
-        await bookStore.addBook(newBook);
+      await bookStore.addBook(newBook);
     }
     clearForm();
+    setModalOpen(false);
   };
 
   const clearForm = () => {
@@ -68,14 +62,15 @@ const BookManagementPage = observer(() => {
       coverUrl: '',
       publicationDate: dayjs(new Date()).format('YYYY-MM-DD'),
     });
-    // setFile(null);
   };
 
   const handleEditBook = (book: Book) => {
     setNewBook(book);
+    setModalOpen(true);
   };
 
-  if (bookStore.loading) return <CircularProgress sx={{ margin: 'auto', display: 'block' }} />;
+  if (bookStore.loading)
+    return <CircularProgress sx={{ margin: 'auto', display: 'block' }} />;
 
   return (
     <Box sx={{ padding: 3 }}>
@@ -83,77 +78,50 @@ const BookManagementPage = observer(() => {
         Manage Books
       </Typography>
 
-      <Grid container spacing={6} sx={{ marginBottom: 4 }}>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Title"
-            variant="outlined"
-            fullWidth
-            value={newBook.title}
-            onChange={(e) => setNewBook({ ...newBook, title: e.target.value })}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Author"
-            variant="outlined"
-            fullWidth
-            value={newBook.author}
-            onChange={(e) => setNewBook({ ...newBook, author: e.target.value })}
-        />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <DatePicker
-            value={dayjs(newBook.publicationDate)}
-            onChange={(date) => {
-              if (date) {
-                const formattedDate = dayjs(date).format('YYYY-MM-DD');
-                setNewBook({ ...newBook, publicationDate: formattedDate });
-              }
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Cover Url"
-            variant="outlined"
-            fullWidth
-            value={newBook.coverUrl}
-            onChange={(e) => setNewBook({ ...newBook, coverUrl: e.target.value })}         
-        />
-        </Grid>
-      </Grid>
-
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Button variant="contained" onClick={handleAddUpdateBook}>
-            {newBook.id ? 'Update Book' : 'Add Book'}
-          </Button>
-        </Grid>
-      </Grid>
-
-      <Typography variant="h5" gutterBottom>
-        Current Books
-      </Typography>
+      <Button
+        variant="contained"
+        onClick={() => {
+          clearForm();
+          setModalOpen(true);
+        }}
+        sx={{ marginBottom: 2 }}
+      >
+        Add New Book
+      </Button>
 
       <Grid container spacing={2}>
         {bookStore.books.map((book) => (
           <Grid item xs={12} sm={6} md={4} key={book.id}>
             <Card sx={{ display: 'flex', flexDirection: 'row', padding: 1 }}>
-              <Image
-                src={book.coverUrl ?? ''}
+              <Box
+                component="img"
+                src={book.coverUrl || defaultBookCoverUrl}
                 alt={book.title}
-                style={{ width: '150px', height: 'auto', borderRadius: '4px', marginRight: '16px' }}
+                sx={{
+                  width: '150px',
+                  height: 'auto',
+                  borderRadius: '4px',
+                  marginRight: '16px',
+                }}
               />
               <CardContent sx={{ flex: 1 }}>
                 <Typography variant="h6">{book.title}</Typography>
                 <Typography variant="subtitle1">{book.author}</Typography>
-                <Typography variant="body2">{`Published on: ${book.publicationDate}`}</Typography>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', marginTop: 2 }}>
+                <Typography variant="body2">{`Published on: ${formatDate(book.publicationDate)}`}</Typography>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    marginTop: 2,
+                  }}
+                >
                   <IconButton onClick={() => handleEditBook(book)}>
                     <EditIcon />
                   </IconButton>
-                  <IconButton onClick={() => bookStore.deleteBook(book.id ?? '')} color="error">
+                  <IconButton
+                    onClick={() => bookStore.deleteBook(book.id ?? '')}
+                    color="error"
+                  >
                     <DeleteIcon />
                   </IconButton>
                 </Box>
@@ -162,6 +130,78 @@ const BookManagementPage = observer(() => {
           </Grid>
         ))}
       </Grid>
+
+      <Dialog open={modalOpen} onClose={() => setModalOpen(false)}>
+        <DialogTitle>{newBook.id ? 'Edit Book' : 'Add Book'}</DialogTitle>
+        <DialogContent>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <TextField
+                label="Title"
+                variant="outlined"
+                fullWidth
+                value={newBook.title}
+                onChange={(e) =>
+                  setNewBook({ ...newBook, title: e.target.value })
+                }
+                size="small"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Author"
+                variant="outlined"
+                fullWidth
+                value={newBook.author}
+                onChange={(e) =>
+                  setNewBook({ ...newBook, author: e.target.value })
+                }
+                size="small"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <TextField
+                label="Cover Url"
+                variant="outlined"
+                fullWidth
+                value={newBook.coverUrl}
+                onChange={(e) =>
+                  setNewBook({ ...newBook, coverUrl: e.target.value })
+                }
+                size="small"
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={4}>
+                  <Typography variant="body1">Publication Date:</Typography>
+                </Grid>
+                <Grid item xs={8}>
+                  <DatePicker
+                    value={dayjs(newBook.publicationDate)}
+                    maxDate={dayjs(new Date())}
+                    onChange={(date) => {
+                      if (date) {
+                        const formattedDate = dayjs(date).format('YYYY-MM-DD');
+                        setNewBook({
+                          ...newBook,
+                          publicationDate: formattedDate,
+                        });
+                      }
+                    }}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleAddUpdateBook}>
+            {newBook.id ? 'Update Book' : 'Add Book'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 });

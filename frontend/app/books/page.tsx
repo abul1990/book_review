@@ -9,15 +9,20 @@ import {
   Box,
   Rating,
   CircularProgress,
-  Input,
+  TextField,
+  InputAdornment,
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useRouter } from 'next/navigation';
 import { bookStore } from '../stores/bookStore';
-import { Book } from '../models/types';
+import { Book, defaultBookCoverUrl } from '../models/types';
+import { useAuth } from '../hooks/useAuth';
+import { formatDate } from '../utils/date-formatter';
+import { Search } from '@mui/icons-material';
 
 const BooksPage = observer(() => {
+  useAuth();
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -31,30 +36,33 @@ const BooksPage = observer(() => {
 
   const handleBookClick = (book: Book) => {
     bookStore.setSelectedBook(book);
-    router.push(`/books/${book.id}/reviews`); 
-  }
+    router.push(`/books/${book.id}/reviews`);
+  };
 
-  if (bookStore.loading) return <CircularProgress sx={{ display: 'block', margin: 'auto' }} />;
-  if (bookStore.books.length === 0) return <Typography>No books found.</Typography>;
+  if (bookStore.loading)
+    return <CircularProgress sx={{ display: 'block', margin: 'auto' }} />;
+  if (bookStore.books.length === 0)
+    return <Typography>No books found.</Typography>;
 
   return (
     <Box sx={{ padding: 3 }}>
-    <Input
-      placeholder="Search by Title or Author"
-      value={searchQuery}
-      onChange={(e) => setSearchQuery(e.target.value)}
-      sx={{
-        height: '36px', 
-        fontSize: '14px',
-        padding: '4px 8px', 
-        border: '1px solid #e0e0e0',
-        borderRadius: '4px',
-        marginBottom: 3,
-        width: '100%'
-      }}
-    />
+      <TextField
+        label="Search by Title, Author"
+        variant="outlined"
+        fullWidth
+        value={searchQuery}
+        onChange={(e: React.ChangeEvent<HTMLInputElement> ) => setSearchQuery(e.target.value)}
+        size="small"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <Search />
+            </InputAdornment>
+          ),
+        }}
+      />
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} marginTop={2}>
         {filteredBooks.map((book) => (
           <Grid item xs={12} sm={6} md={4} key={book.id}>
             <Card
@@ -63,6 +71,7 @@ const BooksPage = observer(() => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: 1,
+                position: 'relative', // Make the card relative
               }}
               onClick={() => handleBookClick(book)}
               style={{ cursor: 'pointer' }}
@@ -70,7 +79,7 @@ const BooksPage = observer(() => {
               <CardMedia
                 component="img"
                 sx={{ width: 80, height: 120, objectFit: 'cover' }}
-                image={book.coverUrl}
+                image={book?.coverUrl || defaultBookCoverUrl}
                 alt={`${book.title} cover`}
               />
 
@@ -80,16 +89,17 @@ const BooksPage = observer(() => {
                   {book.author}
                 </Typography>
                 <Typography variant="body2" color="textSecondary">
-                  Published: 
+                  Published On: {formatDate(book.publicationDate)}
                 </Typography>
               </CardContent>
 
               <Box
                 sx={{
+                  position: 'absolute', // Make the box position absolute
+                  top: 8, // Adjust as needed
+                  right: 8, // Adjust as needed
                   display: 'flex',
-                  flexDirection: 'column',
                   alignItems: 'center',
-                  marginRight: 2,
                 }}
               >
                 <Rating

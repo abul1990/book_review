@@ -1,4 +1,5 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, runInAction } from 'mobx';
+import Cookies from 'js-cookie';
 import { User } from '../models/types';
 import apiClient from '../utils/axios-instance';
 
@@ -38,9 +39,7 @@ class UserStore {
     try {
       const response = await apiClient.post('/users', user);
 
-      if (response.status === 200) {
-        const user: User = response.data;
-        this.loggedInUser = user;
+      if (response.status === 201) {
         return true;
       } else {
         this.error = 'User registration failed!';
@@ -55,27 +54,41 @@ class UserStore {
     }
   }
 
-  async login(credentials: { email: string; password: string }) {
+  async login(credentials: { email: string; password: string }): Promise<boolean> {
     this.loading = true;
 
     try {
-      const response = await apiClient.post('/users/login', credentials);
+      const response = await apiClient.post('/auth/login', credentials);
 
-      if (response.status === 201) {
-        const user: User = response.data;
-        this.loggedInUser = user;
+      if (response.status === 200) {
+        const { access_token, user } = response.data;
+        runInAction(() => {
+          this.loggedInUser = user;
+          if(typeof window !== 'undefined') {
+            localStorage.setItem('loggedInUser', JSON.stringify(user));
+          }
+          Cookies.set('access_token', access_token, { expires: 1, secure: true });
+        })
         return true;
       } else {
         this.error = 'Invalid credentials!';
         return false;
       }
     } catch (error) {
+      console.error(error)
       this.error = 'Something went wrong!!';
-      console.error('Login error:', error);
       return false;
     } finally {
       this.loading = false;
     }
+  }
+
+  logout() {
+    this.loggedInUser = null;
+    if(typeof window !== 'undefined') {
+      localStorage.clear();
+    }
+    Cookies.remove('access_token');
   }
 }
 

@@ -10,22 +10,41 @@ import {
   Box,
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useThemeContext } from './CustomThemeProvider';
 import { userStore } from '../stores/userStore';
-import Cookies from 'js-cookie';
+import { observer } from 'mobx-react-lite';
+import { useEffect, useState } from 'react';
 
-const Navbar = () => {
+const Navbar = observer(() => {
   const isAdmin = userStore.loggedInUser?.role === 'admin';
   const isUserLoggedIn = !!userStore.loggedInUser;
   const router = useRouter();
+  const pathname = usePathname();
   const { darkMode, toggleTheme } = useThemeContext();
 
+  const [selectedTab, setSelectedTab] = useState('');
+
+  useEffect(() => {
+    if (pathname.startsWith('/books')) {
+      setSelectedTab('books');
+    } else if (pathname === '/reviews') {
+      setSelectedTab('reviews');
+    } else if (isAdmin && pathname === '/admin/books') {
+      setSelectedTab('manage');
+    } else {
+      setSelectedTab('');
+    }
+  }, [pathname, isAdmin]);
+
   const handleLogout = () => {
-    userStore.loggedInUser = null;
-    Cookies.remove('loggedInUser');
-    localStorage.clear();
+    userStore.logout();
     router.push('/login');
+  };
+
+  const handleNavigation = (path: string, tab: string) => {
+    router.push(path);
+    setSelectedTab(tab);
   };
 
   return (
@@ -41,16 +60,25 @@ const Navbar = () => {
 
         {isUserLoggedIn && (
           <Box sx={{ display: 'flex', gap: 2, flexGrow: 1 }}>
-            <Button color="inherit" onClick={() => router.push('/books')}>
+            <Button
+              color={selectedTab === 'books' ? 'primary' : 'inherit'}
+              onClick={() => handleNavigation('/books', 'books')}
+            >
               Books
             </Button>
 
-            <Button color="inherit" onClick={() => router.push('/reviews')}>
+            <Button
+              color={selectedTab === 'reviews' ? 'primary' : 'inherit'}
+              onClick={() => handleNavigation('/reviews', 'reviews')}
+            >
               Reviews
             </Button>
 
             {isAdmin && (
-              <Button color="inherit" onClick={() => router.push('/admin/books')}>
+              <Button
+                color={selectedTab === 'manage' ? 'primary' : 'inherit'}
+                onClick={() => handleNavigation('/admin/books', 'manage')}
+              >
                 Manage
               </Button>
             )}
@@ -68,6 +96,6 @@ const Navbar = () => {
       </Toolbar>
     </AppBar>
   );
-};
+});
 
 export default Navbar;

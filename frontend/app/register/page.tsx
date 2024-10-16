@@ -7,16 +7,21 @@ import {
   Grid,
   TextField,
   Typography,
+  Select,
+  MenuItem,
+  InputLabel,
+  FormControl,
   useTheme,
+  SelectChangeEvent,
+  Link,
 } from '@mui/material';
 import { userStore } from '@/app/stores/userStore';
-import { User } from '../models/types';
+import { Role, User } from '../models/types';
 import { useRouter } from 'next/navigation';
 
 const RegistrationPage: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
-
 
   const [formData, setFormData] = useState<User>({
     name: '',
@@ -29,7 +34,18 @@ const RegistrationPage: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleRoleChange = (event: SelectChangeEvent) => {
+    setFormData({ ...formData, role: event.target.value as string });
+  };
+
   const handleRegister = async () => {
+    const isFormValid = Object.values(formData).every(field => field.trim() !== '');
+  
+    if (!isFormValid) {
+      alert('Please fill in all fields.');
+      return;
+    }
+  
     try {
       const success = await userStore.registerUser(formData);
       if (success) {
@@ -39,10 +55,11 @@ const RegistrationPage: React.FC = () => {
         alert(userStore.error || 'Registration failed. Please try again.');
       }
     } catch (error) {
-      console.error("Registration error:", error);
+      console.error('Registration error:', error);
       alert('Registration failed. Please try again.');
     }
   };
+  
 
   return (
     <Box
@@ -77,6 +94,7 @@ const RegistrationPage: React.FC = () => {
               fullWidth
               onChange={handleChange}
               value={formData.name}
+              size='small'
             />
           </Grid>
           <Grid item xs={12}>
@@ -86,6 +104,7 @@ const RegistrationPage: React.FC = () => {
               fullWidth
               onChange={handleChange}
               value={formData.email}
+              size='small'
             />
           </Grid>
           <Grid item xs={12}>
@@ -96,21 +115,40 @@ const RegistrationPage: React.FC = () => {
               fullWidth
               onChange={handleChange}
               value={formData.password}
+              size='small'
             />
           </Grid>
           <Grid item xs={12}>
-            <TextField
-              label="Role"
-              name="role"
-              fullWidth
-              onChange={handleChange}
-              value={formData.role}
-            />
+            <FormControl fullWidth>
+              <InputLabel id="role-select-label">Role</InputLabel>
+              <Select
+                labelId="role-select-label"
+                name="role"
+                value={formData.role}
+                onChange={handleRoleChange}
+                label="Role"
+                size='small'
+              >
+                {Object.values(Role).map((role) => (
+                  <MenuItem key={role} value={role}>
+                    {role}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Grid>
-          <Grid item alignItems={'center'}>
-            <Button variant="contained" onClick={handleRegister}>
+          <Grid item xs={12}>
+            <Button variant="contained" fullWidth onClick={handleRegister}>
               Register
             </Button>
+          </Grid>
+          <Grid item xs={12} textAlign="center">
+            <Typography variant="body2" color="textPrimary">
+              {"Have an account? "}
+              <Link href="/login" underline="hover" color="primary">
+                Login
+              </Link>
+            </Typography>
           </Grid>
         </Grid>
       </Box>

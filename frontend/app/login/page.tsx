@@ -17,11 +17,7 @@ const LoginPage: React.FC = () => {
   const handleLogin = async () => {
     const success = await userStore.login(credentials);
     if (success) {
-      document.cookie = `loggedInUser=${credentials.email}; path=/`;
-      if(typeof window !== 'undefined') {
-        localStorage.setItem('loggedInUser', JSON.stringify(userStore.loggedInUser));
-      }
-      router.push('/');
+      router.push('/books');
     } else {
       alert('Invalid credentials!');
     }
@@ -60,20 +56,21 @@ const LoginPage: React.FC = () => {
                 fullWidth
                 onChange={handleChange}
                 value={credentials[field as keyof typeof credentials]}
-                InputProps={{
-                  sx: {
-                    borderRadius: 1,
-                    '& .MuiOutlinedInput-notchedOutline': {
-                      borderColor: theme.palette.divider,
-                    },
-                    '&:hover .MuiOutlinedInput-notchedOutline': {
-                      borderColor: theme.palette.primary.main,
-                    },
-                    '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                      borderColor: theme.palette.primary.main,
-                    },
-                  },
-                }}
+                size='small'
+                // InputProps={{
+                //   sx: {
+                //     borderRadius: 1,
+                //     '& .MuiOutlinedInput-notchedOutline': {
+                //       borderColor: theme.palette.divider,
+                //     },
+                //     '&:hover .MuiOutlinedInput-notchedOutline': {
+                //       borderColor: theme.palette.primary.main,
+                //     },
+                //     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                //       borderColor: theme.palette.primary.main,
+                //     },
+                //   },
+                // }}
               />
             </Grid>
           ))}

@@ -53,6 +53,14 @@ export class UsersService {
     if (result.affected === 0) throw new NotFoundException('User not found');
   }
 
+  async findUserByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { email: email } });
+    if (!user) {
+      throw new UnauthorizedException('Invalid email or password');
+    }
+    return user;
+  }
+
   async login(loginDTO: LoginDTO): Promise<UserResponseDTO> {
     const user = await this.usersRepository.findOne({ where: { email: loginDTO.email } });
     if (!user) {

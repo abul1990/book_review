@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Post,
-  Patch,
   Delete,
   Param,
   Body,
@@ -14,6 +13,8 @@ import {
 import { BooksService } from './books.service';
 import { BookRequestDto, BookResponseDto } from './dto/book.dto';
 import { ReviewResponseDto } from 'src/reviews/dto/review.dto';
+import { Roles } from 'src/auth/roles.decorator';
+import { UserRole } from 'src/users/entities/user-role.enum';
 
 @Controller('books')
 export class BooksController {
@@ -21,6 +22,7 @@ export class BooksController {
 
   @Post()
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  @Roles(UserRole.ADMIN)
   create(@Body() bookDto: BookRequestDto): Promise<BookResponseDto> {
     return this.booksService.create(bookDto);
   }
@@ -47,6 +49,7 @@ export class BooksController {
 
   @Put(':id')
   @UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
+  @Roles(UserRole.ADMIN)
   update(
     @Param('id') id: string,
     @Body() bookDto: BookRequestDto,
@@ -55,6 +58,7 @@ export class BooksController {
   }
 
   @Delete(':id')
+  @Roles(UserRole.ADMIN)
   remove(@Param('id') id: string): Promise<void> {
     return this.booksService.remove(id);
   }

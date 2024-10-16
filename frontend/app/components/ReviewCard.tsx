@@ -14,17 +14,13 @@ import { Review } from '../models/types';
 import { useState } from 'react';
 import { Cancel } from '@mui/icons-material';
 import { reviewStore } from '../stores/reviewStore';
-import Image from 'next/image';
 
 interface ReviewCardProps {
   review: Review;
   isUserReview: boolean;
 }
 
-export default function ReviewCard({
-  review,
-  isUserReview
-}: ReviewCardProps) {
+export default function ReviewCard({ review, isUserReview }: ReviewCardProps) {
   const formattedDate = new Date(review.createdAt!).toLocaleDateString(
     'en-GB',
     {
@@ -67,7 +63,18 @@ export default function ReviewCard({
     >
       <CardContent>
         <Box display="flex" alignItems="center" mb={2}>
-          <Image
+          <Box
+            component="img"
+            src={review.user?.coverPicUrl || 'https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-profile-picture-business-profile-woman-suitable-social-media-profiles-icons-screensavers-as-templatex9_719432-1328.jpg'}
+            sx={{
+              width: '40px',
+              height: '40px',
+              borderRadius: '50%',
+              marginRight: '10px',
+            }}
+          />
+
+          {/* <Image
             src={review.user?.coverPicUrl ?? ''}
             alt="review"
             style={{
@@ -76,23 +83,23 @@ export default function ReviewCard({
               borderRadius: '50%',
               marginRight: '10px',
             }}
-          />
+          /> */}
           <Typography variant="h6" component="span" sx={{ fontWeight: 'bold' }}>
             {review.user?.name}
           </Typography>
           <Box sx={{ flexGrow: 1 }} />
           {isEditing ? (
             <Rating
-            name={`edit-rating-${review.id!}`}
-            value={editableReview.rating || 0}
-            precision={0.5}
-            onChange={(_, newValue) =>
-              setEditableReview((prev) => ({
-                ...prev,
-                rating: newValue!,
-              }))
-            }
-          />
+              name={`edit-rating-${review.id!}`}
+              value={editableReview.rating || 0}
+              precision={0.5}
+              onChange={(_, newValue) =>
+                setEditableReview((prev) => ({
+                  ...prev,
+                  rating: newValue!,
+                }))
+              }
+            />
           ) : (
             <Rating value={review.rating} readOnly precision={0.5} />
           )}
@@ -146,19 +153,19 @@ export default function ReviewCard({
 
         {isEditing ? (
           <TextField
-          fullWidth
-          multiline
-          minRows={3}
-          value={editableReview.comment || ''}
-          onChange={(e) =>
-            setEditableReview((prev) => ({
-              ...prev,
-              comment: e.target.value,
-            }))
-          }
-          sx={{ marginTop: 2 }}
-        />
-      ) : (
+            fullWidth
+            multiline
+            minRows={3}
+            value={editableReview.comment || ''}
+            onChange={(e) =>
+              setEditableReview((prev) => ({
+                ...prev,
+                comment: e.target.value,
+              }))
+            }
+            sx={{ marginTop: 2 }}
+          />
+        ) : (
           <Typography sx={{ marginTop: 1 }}>{review.comment}</Typography>
         )}
       </CardContent>

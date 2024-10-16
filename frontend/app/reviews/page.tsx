@@ -21,9 +21,11 @@ import {
 import { Save, Cancel, Search } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { Review } from '../models/types';
+import { defaultBookCoverUrl, Review } from '../models/types';
+import { useAuth } from '../hooks/useAuth';
 
 const ReviewsPage = observer(() => {
+  useAuth();
   const loggedInUser = userStore.loggedInUser;
   const [editMode, setEditMode] = useState<{ [key: string]: boolean }>({});
   const [editableReview, setEditableReview] = useState<Partial<Review>>({});
@@ -81,9 +83,10 @@ const ReviewsPage = observer(() => {
 
       <TextField
         fullWidth
-        placeholder="Search by book title, author, or rating"
+        label="Search by book Title, Author, or Rating"
         variant="outlined"
         value={searchQuery}
+        size='small'
         onChange={handleSearchChange}
         InputProps={{
           startAdornment: (
@@ -116,7 +119,7 @@ const ReviewsPage = observer(() => {
                 <CardMedia
                   component="img"
                   sx={{ width: 120, height: 160, marginRight: 2 }}
-                  image={review.book?.coverUrl || '/default-cover.jpg'}
+                  image={review.book?.coverUrl || defaultBookCoverUrl}
                   alt="Book cover"
                 />
                 <Box sx={{ flex: 1 }}>
