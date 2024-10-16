@@ -12,5 +12,6 @@ import { User } from 'src/users/entities/user.entity';
       ],    
     controllers: [ReviewsController],
     providers: [ReviewsService],
+    exports: [ReviewsService],
   })
 export class ReviewsModule {}
