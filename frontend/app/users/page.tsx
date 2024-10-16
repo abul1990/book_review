@@ -17,7 +17,7 @@ export default function UsersPage() {
           <ListItem key={user.id}>
             <ListItemText
               primary={user.name}
-              secondary={`Email: ${user.email}, Joined: ${new Date(user.joinedDate).toLocaleDateString()}`}
+              secondary={`Email: ${user.email}, Joined `}
             />
           </ListItem>
         ))}
