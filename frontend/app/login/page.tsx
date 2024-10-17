@@ -1,7 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Button, Grid, TextField, Typography, Link, useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  Typography,
+  Link,
+  useTheme,
+} from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { userStore } from '@/app/stores/userStore';
 
@@ -10,11 +18,38 @@ const LoginPage: React.FC = () => {
   const theme = useTheme();
   const [credentials, setCredentials] = useState({ email: '', password: '' });
 
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+  });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
+  const validateForm = () => {
+    const newErrors = {
+      email: '',
+      password: ''
+    };
+
+    if (!credentials.email) {
+      newErrors.email = 'Email required';
+    }
+
+    if (!credentials.password) {
+      newErrors.password = 'Password required';
+    }
+
+    setErrors(newErrors);
+    return !newErrors.password && !newErrors.email;
+  };
+
   const handleLogin = async () => {
+    const isValid = validateForm();
+    if(!isValid) {
+      return;
+    }
     const success = await userStore.login(credentials);
     if (success) {
       router.push('/books');
@@ -22,6 +57,7 @@ const LoginPage: React.FC = () => {
       alert('Invalid credentials!');
     }
   };
+  
 
   return (
     <Box
@@ -37,10 +73,13 @@ const LoginPage: React.FC = () => {
         sx={{
           width: 400,
           padding: 4,
-          backgroundColor: theme.palette.mode === 'dark' ? '#1E1E1E' : theme.palette.background.paper, 
+          backgroundColor:
+            theme.palette.mode === 'dark'
+              ? '#1E1E1E'
+              : theme.palette.background.paper,
           borderRadius: 2,
           boxShadow: 3,
-          color: theme.palette.text.primary, 
+          color: theme.palette.text.primary,
         }}
       >
         <Typography variant="h4" gutterBottom align="center">
@@ -56,21 +95,9 @@ const LoginPage: React.FC = () => {
                 fullWidth
                 onChange={handleChange}
                 value={credentials[field as keyof typeof credentials]}
-                size='small'
-                // InputProps={{
-                //   sx: {
-                //     borderRadius: 1,
-                //     '& .MuiOutlinedInput-notchedOutline': {
-                //       borderColor: theme.palette.divider,
-                //     },
-                //     '&:hover .MuiOutlinedInput-notchedOutline': {
-                //       borderColor: theme.palette.primary.main,
-                //     },
-                //     '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                //       borderColor: theme.palette.primary.main,
-                //     },
-                //   },
-                // }}
+                size="small"
+                error={field === 'email' ? !!errors.email : !!errors.password}
+                helperText={field === 'email' ? errors.email : errors.password}
               />
             </Grid>
           ))}

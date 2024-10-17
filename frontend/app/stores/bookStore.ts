@@ -1,10 +1,11 @@
 import { makeAutoObservable, runInAction } from 'mobx';
 import apiClient from '@/app/utils/axios-instance';
-import { Book } from '@/app/models/types';
+import { Book, RatingDistribution } from '@/app/models/types';
 
 class BookStore {
   books: Book[] = [];
   selectedBook: Book | null = null;
+  ratingDistribution: RatingDistribution[] = [];
   loading: boolean = false;
 
   constructor() {
@@ -36,6 +37,26 @@ class BookStore {
     } catch (error) {
       console.error('Failed to add book:', error);
     }
+  }
+
+  async getBook(id: string) {
+    try {
+      const response = await apiClient.get(`/books/${id}`);
+      runInAction(() => {
+        this.selectedBook = response.data;
+      });
+    } catch (error) {
+      console.error('Failed to update book:', error);
+    }
+  }
+
+  async refreshSelectedBook(id: string) {
+    Promise.all([this.getBook(id), this.getDistribution(id)]);
+  }
+
+  async getDistribution(id: string) {
+    const response = await apiClient.get<RatingDistribution[]>(`/books/${id}/reviews/rating-distribution`);
+    this.ratingDistribution = response.data;
   }
 
   async updateBook(updatedBook: Book) {

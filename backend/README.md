@@ -21,10 +21,6 @@ This is the **backend** of the Book Review App, built with **NestJS**. It provid
 - **NestJS**: Backend framework for building scalable applications.
 - **TypeORM**: ORM for database interactions.
 - **PostgreSQL**: Relational database for persistent storage.
-- **Swagger**: API documentation generator.
-- **Jest**: For unit and integration testing.
-- **Docker**: Containerization for deployment.
-
 ---
 
 ## Project Setup (Run Locally)
@@ -62,8 +58,12 @@ npm install
 Create a `.env` file at the root of the project with the following content:
 
 ```bash
-DATABASE_URL=postgres://<user>:<password>@localhost:5432/book_review
-JWT_SECRET=your_jwt_secret
+DB_HOST='localhost',
+DB_PORT=5432,
+DB_USERNAME='postgres',
+DB_PASSWORD='password',
+DB_DATABASE='book_reviews',
+JWT_SECRET='your_jwt_secret'
 PORT=8080
 ```
 

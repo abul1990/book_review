@@ -17,6 +17,7 @@ import {
   IconButton,
   TextField,
   InputAdornment,
+  Link,
 } from '@mui/material';
 import { Save, Cancel, Search } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
@@ -24,6 +25,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { defaultBookCoverUrl, Review } from '../models/types';
 import { useAuth } from '../hooks/useAuth';
 import { formatDate } from '../utils/date-formatter';
+import { useRouter } from 'next/navigation';
 
 const ReviewsPage = observer(() => {
   useAuth();
@@ -31,6 +33,7 @@ const ReviewsPage = observer(() => {
   const [editMode, setEditMode] = useState<{ [key: string]: boolean }>({});
   const [editableReview, setEditableReview] = useState<Partial<Review>>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const reviews = reviewStore.reviews;
 
   useEffect(() => {
     const fetchReviews = async () => {
@@ -63,7 +66,7 @@ const ReviewsPage = observer(() => {
     setSearchQuery(e.target.value);
   };
 
-  const filteredReviews = reviewStore.reviews.filter((review: Review) => {
+  const filteredReviews = reviews.filter((review: Review) => {
     const { book, rating } = review;
     return (
       book!.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -74,6 +77,28 @@ const ReviewsPage = observer(() => {
 
   if (reviewStore.loading) {
     return <CircularProgress />;
+  }
+
+  if (reviews.length === 0) {
+    const router = useRouter();
+  
+    return (
+      <>
+        <Typography variant="h6" gutterBottom>
+          {loggedInUser?.name}, You haven't added any reviews.
+        </Typography>
+        <Typography variant="body1">
+          Start reviewing your favorite{' '}
+          <Link
+            component="button"
+            onClick={() => router.push('/books')}
+            underline="hover"
+          >
+            books!
+          </Link>
+        </Typography>
+      </>
+    );
   }
 
   return (
@@ -87,7 +112,7 @@ const ReviewsPage = observer(() => {
         label="Search by book Title, Author, or Rating"
         variant="outlined"
         value={searchQuery}
-        size='small'
+        size="small"
         onChange={handleSearchChange}
         InputProps={{
           startAdornment: (
@@ -140,7 +165,6 @@ const ReviewsPage = observer(() => {
                     >
                       Reviewed On {formatDate(review.createdAt!)}
                     </Typography>
-
 
                     {editMode[review.id!] ? (
                       <Stack

@@ -7,16 +7,12 @@ import {
   Grid,
   TextField,
   Typography,
-  Select,
-  MenuItem,
-  InputLabel,
-  FormControl,
   useTheme,
   SelectChangeEvent,
   Link,
 } from '@mui/material';
 import { userStore } from '@/app/stores/userStore';
-import { Role, User } from '../models/types';
+import { User } from '../models/types';
 import { useRouter } from 'next/navigation';
 
 const RegistrationPage: React.FC = () => {
@@ -27,27 +23,54 @@ const RegistrationPage: React.FC = () => {
     name: '',
     email: '',
     password: '',
-    role: '',
+  });
+
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRoleChange = (event: SelectChangeEvent) => {
-    setFormData({ ...formData, role: event.target.value as string });
+  const validateForm = () => {
+    const newErrors = {
+      name: '',
+      email: '',
+      password: '',
+      role: '',
+    };
+
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(formData.name)) {
+      newErrors.name = 'Name can only contain alphabets.';
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      newErrors.email = 'Invalid email format.';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Password required';
+    }
+
+    setErrors(newErrors);
+    return !newErrors.name && !newErrors.email && !newErrors.password;
   };
 
   const handleRegister = async () => {
-    const isFormValid = Object.values(formData).every(field => field.trim() !== '');
-  
+    const isFormValid = validateForm();
+
     if (!isFormValid) {
-      alert('Please fill in all fields.');
       return;
     }
-  
+
     try {
-      const success = await userStore.registerUser(formData);
+      const withRole = {...formData, role: 'user'}
+      const success = await userStore.registerUser(withRole);
       if (success) {
         alert('User registered successfully!');
         router.push('/login');
@@ -59,7 +82,6 @@ const RegistrationPage: React.FC = () => {
       alert('Registration failed. Please try again.');
     }
   };
-  
 
   return (
     <Box
@@ -89,53 +111,43 @@ const RegistrationPage: React.FC = () => {
         <Grid container spacing={2}>
           <Grid item xs={12}>
             <TextField
+              required
               label="Name"
               name="name"
               fullWidth
               onChange={handleChange}
               value={formData.name}
-              size='small'
+              size="small"
+              error={!!errors.name}
+              helperText={errors.name}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
+              required
               label="Email"
               name="email"
               fullWidth
               onChange={handleChange}
               value={formData.email}
-              size='small'
+              size="small"
+              error={!!errors.email}
+              helperText={errors.email}
             />
           </Grid>
           <Grid item xs={12}>
             <TextField
+              required
               label="Password"
               name="password"
               type="password"
               fullWidth
               onChange={handleChange}
               value={formData.password}
-              size='small'
+              size="small"
+              error={!!errors.password}
+              helperText={errors.password}
             />
-          </Grid>
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <InputLabel id="role-select-label">Role</InputLabel>
-              <Select
-                labelId="role-select-label"
-                name="role"
-                value={formData.role}
-                onChange={handleRoleChange}
-                label="Role"
-                size='small'
-              >
-                {Object.values(Role).map((role) => (
-                  <MenuItem key={role} value={role}>
-                    {role}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
           </Grid>
           <Grid item xs={12}>
             <Button variant="contained" fullWidth onClick={handleRegister}>
@@ -144,7 +156,7 @@ const RegistrationPage: React.FC = () => {
           </Grid>
           <Grid item xs={12} textAlign="center">
             <Typography variant="body2" color="textPrimary">
-              {"Have an account? "}
+              {'Have an account? '}
               <Link href="/login" underline="hover" color="primary">
                 Login
               </Link>

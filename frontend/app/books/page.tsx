@@ -47,7 +47,7 @@ const BooksPage = observer(() => {
   return (
     <Box sx={{ padding: 3 }}>
       <TextField
-        label="Search by Title, Author"
+        label="Search by Title or Author"
         variant="outlined"
         fullWidth
         value={searchQuery}

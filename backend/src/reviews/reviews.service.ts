@@ -58,8 +58,9 @@ export class ReviewsService {
     const ratingDistribution = Array(5).fill(0);
 
     reviews.forEach(review => {
-      if (review.rating >= 1 && review.rating <= 5) {
-        ratingDistribution[review.rating - 1]++;
+      const roundedRating = Math.round(review.rating);
+      if (roundedRating >= 1 && roundedRating <= 5) {
+        ratingDistribution[roundedRating - 1]++;
       }
     });
 

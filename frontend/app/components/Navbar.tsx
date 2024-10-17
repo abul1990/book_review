@@ -8,8 +8,15 @@ import {
   IconButton,
   Switch,
   Box,
+  Link,
+  useTheme,
 } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
+import {
+  DarkMode,
+  Home,
+  LightMode,
+  Menu as MenuIcon,
+} from '@mui/icons-material';
 import { usePathname, useRouter } from 'next/navigation';
 import { useThemeContext } from './CustomThemeProvider';
 import { userStore } from '../stores/userStore';
@@ -24,6 +31,7 @@ const Navbar = observer(() => {
   const { darkMode, toggleTheme } = useThemeContext();
 
   const [selectedTab, setSelectedTab] = useState('');
+  const menuColor = darkMode ? 'primary' : 'secondary';
 
   useEffect(() => {
     if (pathname.startsWith('/books')) {
@@ -50,8 +58,13 @@ const Navbar = observer(() => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <IconButton edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
-          <MenuIcon />
+        <IconButton
+          edge="start"
+          color="inherit"
+          aria-label="menu"
+          sx={{ mr: 2 }}
+        >
+          <Home onClick={() => handleNavigation('/', '')} />
         </IconButton>
 
         <Typography variant="h6" sx={{ mr: 4 }}>
@@ -61,14 +74,14 @@ const Navbar = observer(() => {
         {isUserLoggedIn && (
           <Box sx={{ display: 'flex', gap: 2, flexGrow: 1 }}>
             <Button
-              color={selectedTab === 'books' ? 'primary' : 'inherit'}
+              color={selectedTab === 'books' ? menuColor : 'inherit'}
               onClick={() => handleNavigation('/books', 'books')}
             >
               Books
             </Button>
 
             <Button
-              color={selectedTab === 'reviews' ? 'primary' : 'inherit'}
+              color={selectedTab === 'reviews' ? menuColor : 'inherit'}
               onClick={() => handleNavigation('/reviews', 'reviews')}
             >
               Reviews
@@ -76,7 +89,7 @@ const Navbar = observer(() => {
 
             {isAdmin && (
               <Button
-                color={selectedTab === 'manage' ? 'primary' : 'inherit'}
+                color={selectedTab === 'manage' ? menuColor : 'inherit'}
                 onClick={() => handleNavigation('/admin/books', 'manage')}
               >
                 Manage
@@ -87,11 +100,18 @@ const Navbar = observer(() => {
 
         <Box sx={{ display: 'flex', alignItems: 'center', ml: 'auto' }}>
           {isUserLoggedIn && (
-            <Button color="inherit" onClick={handleLogout}>
-              Log Out
-            </Button>
+            <Link
+              color="inherit"
+              onClick={handleLogout}
+              underline="hover"
+              sx={{ cursor: 'pointer' }}
+            >
+              Logout
+            </Link>
           )}
-          <Switch checked={darkMode} onChange={toggleTheme} />
+          <IconButton onClick={toggleTheme} color="inherit">
+            {darkMode ? <DarkMode /> : <LightMode />}
+          </IconButton>
         </Box>
       </Toolbar>
     </AppBar>

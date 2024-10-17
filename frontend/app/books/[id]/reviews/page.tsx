@@ -21,6 +21,7 @@ import { useRatingDistribution } from '@/app/hooks/useRatingDistribution';
 import { userStore } from '@/app/stores/userStore';
 import { useAuth } from '@/app/hooks/useAuth';
 import { formatDate } from '@/app/utils/date-formatter';
+import { usePathname } from 'next/navigation';
 
 const getInitialReviewState = (bookId: string): Review => ({
   comment: '',
@@ -31,23 +32,30 @@ const getInitialReviewState = (bookId: string): Review => ({
 
 const ReviewsPage = observer(() => {
   useAuth();
-  const { selectedBook } = bookStore;
+  const pathname = usePathname();
+  const bookId = pathname.split('/').pop(); 
+  const { selectedBook, ratingDistribution } = bookStore;
   const reviews = reviewStore.reviews;
 
   useEffect(() => {
-    if (selectedBook?.id) reviewStore.fetchReviewsByBook(selectedBook.id);
+    if (selectedBook?.id) {
+      reviewStore.fetchReviewsByBook(selectedBook.id);
+      bookStore.getDistribution(selectedBook.id);
+    }
   }, [selectedBook]);
 
   const [newReview, setNewReview] = useState<Review>(
     getInitialReviewState(selectedBook?.id || '')
   );
 
-  const { ratingDistribution, loading: distributionLoading } =
-    useRatingDistribution(selectedBook?.id ?? '');
 
   const handleAddReview = async () => {
     await reviewStore.addReview(newReview);
-    setNewReview(getInitialReviewState(selectedBook?.id || ''));
+    if(selectedBook?.id) {
+      bookStore.refreshSelectedBook(selectedBook?.id);
+      setNewReview(getInitialReviewState(selectedBook?.id || ''));
+    }
+    
   };
 
   if (!selectedBook) {
@@ -64,55 +72,59 @@ const ReviewsPage = observer(() => {
 
   return (
     <Box sx={{ padding: 3 }}>
-      <Grid container spacing={2} alignItems="center" sx={{ marginBottom: 4 }}>
-        <Grid item xs={12} sm={4}>
-          <Box
-            component="img"
-            src={selectedBook.coverUrl || defaultBookCoverUrl}
-            alt={selectedBook.title}
-            sx={{
-              width: '100%',
-              height: 'auto',
-              borderRadius: '4px',
-            }}
-          />
+      {/* First Row: Book (Image + Details) on Left, Customer Reviews on Right */}
+      <Grid container spacing={2} alignItems="stretch" sx={{ marginBottom: 4 }}>
+        {/* Left Side: Book Image + Details */}
+        <Grid item xs={12} md={6}>
+          <Grid container spacing={2} alignItems="start" sx={{ height: '100%' }}>
+            <Grid item xs={12} sm={4}>
+              {/* Book Image */}
+              <Box
+                component="img"
+                src={selectedBook.coverUrl || defaultBookCoverUrl}
+                alt={selectedBook.title}
+                sx={{
+                  width: '100%',
+                  height: 'auto',
+                  borderRadius: '4px',
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} sm={8}>
+              {/* Book Details */}
+              <Typography variant="h4" gutterBottom>
+                {selectedBook.title}
+              </Typography>
+              <Typography variant="h6" gutterBottom>
+                by {selectedBook.author}
+              </Typography>
+              <Typography variant="h6" gutterBottom>
+                Published On: {formatDate(selectedBook.publicationDate)}
+              </Typography>
+              <Rating
+                value={selectedBook.rating}
+                precision={0.5}
+                readOnly
+                size="large"
+                sx={{ color: '#FFD700' }}
+              />
+            </Grid>
+          </Grid>
         </Grid>
-        <Grid item xs={12} sm={8}>
-          <Typography variant="h4" gutterBottom>
-            {selectedBook.title}
+  
+        {/* Right Side: Customer Reviews */}
+        <Grid item xs={12} md={6}>
+          <Typography variant="h5" gutterBottom>
+            Customer Reviews
           </Typography>
-          <Typography variant="h6" gutterBottom>
-            by {selectedBook.author}
-          </Typography>
-          <Typography variant="h6" gutterBottom>
-            Published On: {formatDate(selectedBook.publicationDate)}
-          </Typography>
-          <Rating
-            value={selectedBook.rating}
-            precision={0.5}
-            readOnly
-            size='large'
-            sx={{ color: '#FFD700' }}
-          />
+          <RatingBars distribution={ratingDistribution} />
         </Grid>
       </Grid>
-
-      <Typography variant="h5" gutterBottom sx={{ marginTop: 4 }}>
-        Customer Reviews
-      </Typography>
-
-      {distributionLoading ? (
-        <CircularProgress />
-      ) : (
-        <RatingBars distribution={ratingDistribution} />
-      )}
-
-      <Divider sx={{ margin: '12px 4px' }} />
-
+  
+      {/* Second Row: Rate & Review */}
       <Typography variant="h6" gutterBottom>
         Rate & Review
       </Typography>
-
       <Rating
         name="rating"
         value={newReview.rating || 0}
@@ -124,7 +136,7 @@ const ReviewsPage = observer(() => {
         }}
         size="large"
       />
-
+  
       <TextField
         label="Share your thoughts with others"
         multiline
@@ -137,11 +149,12 @@ const ReviewsPage = observer(() => {
         }
         sx={{ marginBottom: 2 }}
       />
-
-      <Button variant="contained" onClick={handleAddReview}>
+  
+      <Button variant="contained" disabled={!newReview.comment?.trim() || !newReview.rating} onClick={handleAddReview}>
         Post Review
       </Button>
-
+  
+      {/* List of Reviews */}
       <Grid container spacing={2} mt={2}>
         {reviews.map((review) => (
           <Grid item xs={12} key={review.id}>
@@ -154,6 +167,9 @@ const ReviewsPage = observer(() => {
       </Grid>
     </Box>
   );
+  
+  
+  
 });
 
 export default ReviewsPage;
