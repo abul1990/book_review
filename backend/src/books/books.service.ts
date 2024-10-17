@@ -23,13 +23,24 @@ export class BooksService {
 
   async findAll(): Promise<BookResponseDto[]> {
     const books = await this.bookRepository.find();
-    return books.map(this.toResponseDTO);
-  }
+    const reviews = await this.reviewsService.findAll();
+
+    const reviewsByBookId = this.groupReviewsByBookId(reviews);
+  
+    return books.map((book) => {
+      const bookReviews = reviewsByBookId[book.id] || [];
+      const averageRating = this.calculateAverageRating(bookReviews);
+      return this.toResponseDTO(book, averageRating);
+    });  }
 
   async findOne(id: string): Promise<BookResponseDto> {
     const book = await this.bookRepository.findOne({ where: { id } });
     if (!book) throw new NotFoundException('Book not found');
-    return this.toResponseDTO(book);
+
+    const reviews = await this.reviewsService.findByBookId(id);
+    const averageRating = this.calculateAverageRating(reviews);
+
+    return this.toResponseDTO(book, averageRating);
   }
 
   async getReviewsByBookId(bookId: string): Promise<ReviewResponseDto[]> {
@@ -52,8 +63,22 @@ export class BooksService {
     if (result.affected === 0) throw new NotFoundException('Book not found');
   }
 
-  private toResponseDTO(book: Book): BookResponseDto {
+  private groupReviewsByBookId(reviews: { bookId: string; rating: number }[]) {
+    return reviews.reduce((acc, review) => {
+      if (!acc[review.bookId]) acc[review.bookId] = [];
+      acc[review.bookId].push(review);
+      return acc;
+    }, {} as { [key: string]: { rating: number }[] });
+  }
+
+  private calculateAverageRating(reviews: { rating: number }[]): number {
+    if (reviews.length === 0) return 0;
+    const totalRating = reviews.reduce((sum, review) => sum + Number(review.rating), 0);
+    return parseFloat((totalRating / reviews.length).toFixed(1));
+  }
+
+  private toResponseDTO(book: Book, rating?: number): BookResponseDto {
     const { id, title, author, publicationDate, coverUrl } = book;
-    return { id, title, author, publicationDate, coverUrl };
+    return { id, title, author, publicationDate, coverUrl, rating };
   }
 }

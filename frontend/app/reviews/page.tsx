@@ -23,6 +23,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { defaultBookCoverUrl, Review } from '../models/types';
 import { useAuth } from '../hooks/useAuth';
+import { formatDate } from '../utils/date-formatter';
 
 const ReviewsPage = observer(() => {
   useAuth();
@@ -78,7 +79,7 @@ const ReviewsPage = observer(() => {
   return (
     <Box p={4}>
       <Typography variant="h4" gutterBottom>
-        Your Book Reviews
+        {loggedInUser?.name}, Your Book Reviews
       </Typography>
 
       <TextField
@@ -132,6 +133,14 @@ const ReviewsPage = observer(() => {
                     >
                       by {review.book?.author}
                     </Typography>
+                    <Typography
+                      variant="subtitle2"
+                      color="textSecondary"
+                      gutterBottom
+                    >
+                      Reviewed On {formatDate(review.createdAt!)}
+                    </Typography>
+
 
                     {editMode[review.id!] ? (
                       <Stack

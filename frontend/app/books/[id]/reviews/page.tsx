@@ -87,6 +87,13 @@ const ReviewsPage = observer(() => {
           <Typography variant="h6" gutterBottom>
             Published On: {formatDate(selectedBook.publicationDate)}
           </Typography>
+          <Rating
+            value={selectedBook.rating}
+            precision={0.5}
+            readOnly
+            size='large'
+            sx={{ color: '#FFD700' }}
+          />
         </Grid>
       </Grid>
 

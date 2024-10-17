@@ -1,12 +1,10 @@
-// src/reviews/dto/review.dto.ts
-import { IsNotEmpty, IsOptional, IsInt, IsString, Max, Min } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, Max, Min, IsNumber } from 'class-validator';
 import { BookResponseDto } from 'src/books/dto/book.dto';
 import { UserResponseDTO } from 'src/users/dto/user.dto';
-import { User } from 'src/users/entities/user.entity';
 
 export class ReviewRequestDto {
   @IsNotEmpty()
-  @IsInt()
+  @IsNumber({ allowInfinity: false, allowNaN: false }, { message: 'Rating must be a valid number' })
   @Min(1)
   @Max(5)
   rating: number;
@@ -35,7 +33,7 @@ export class ReviewResponseDto {
 
 export class UpdateReviewDto {
   @IsOptional()
-  @IsInt()
+  @IsNumber({ allowInfinity: false, allowNaN: false }, { message: 'Rating must be a valid number' })
   @Min(1)
   @Max(5)
   rating?: number;

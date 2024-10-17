@@ -7,7 +7,7 @@ export class Review {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'int', width: 1 })
+  @Column({ type: 'decimal', precision: 2, scale: 1 })
   rating: number; 
 
   @Column({ length: 500 })

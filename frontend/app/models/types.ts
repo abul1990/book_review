@@ -3,7 +3,7 @@ export interface Book {
   title: string;
   author: string;
   publicationDate: string;
-  averageRating?: number;
+  rating?: number;
   coverUrl?: string;
 }
 

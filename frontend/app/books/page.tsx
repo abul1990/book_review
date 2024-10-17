@@ -95,15 +95,15 @@ const BooksPage = observer(() => {
 
               <Box
                 sx={{
-                  position: 'absolute', // Make the box position absolute
-                  top: 8, // Adjust as needed
-                  right: 8, // Adjust as needed
+                  position: 'absolute',
+                  top: 8,
+                  right: 8,
                   display: 'flex',
                   alignItems: 'center',
                 }}
               >
                 <Rating
-                  value={book.averageRating}
+                  value={book.rating}
                   precision={0.5}
                   readOnly
                   sx={{ color: '#FFD700' }}

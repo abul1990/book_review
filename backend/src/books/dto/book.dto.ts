@@ -20,4 +20,5 @@ export class BookRequestDto {
 
 export class BookResponseDto extends BookRequestDto {
     id: string;
+    rating?: number;
 }
