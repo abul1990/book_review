@@ -8,7 +8,6 @@ import {
   TextField,
   Typography,
   useTheme,
-  SelectChangeEvent,
   Link,
 } from '@mui/material';
 import { userStore } from '@/app/stores/userStore';

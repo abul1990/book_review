@@ -9,7 +9,6 @@ import {
   Typography,
   TextField,
   Button,
-  Divider,
   Rating,
 } from '@mui/material';
 import { reviewStore } from '@/app/stores/reviewStore';
@@ -17,11 +16,9 @@ import { bookStore } from '@/app/stores/bookStore';
 import RatingBars from '@/app/components/RatingBars';
 import ReviewCard from '@/app/components/ReviewCard';
 import { defaultBookCoverUrl, Review } from '@/app/models/types';
-import { useRatingDistribution } from '@/app/hooks/useRatingDistribution';
 import { userStore } from '@/app/stores/userStore';
 import { useAuth } from '@/app/hooks/useAuth';
 import { formatDate } from '@/app/utils/date-formatter';
-import { usePathname } from 'next/navigation';
 
 const getInitialReviewState = (bookId: string): Review => ({
   comment: '',
@@ -32,8 +29,6 @@ const getInitialReviewState = (bookId: string): Review => ({
 
 const ReviewsPage = observer(() => {
   useAuth();
-  const pathname = usePathname();
-  const bookId = pathname.split('/').pop(); 
   const { selectedBook, ratingDistribution } = bookStore;
   const reviews = reviewStore.reviews;
 

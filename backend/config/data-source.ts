@@ -6,8 +6,6 @@ import { Review } from 'src/reviews/entities/reviews.entity';
 
 dotenv.config();
 
-console.log('process.env.DB_HOST => ', process.env.DB_HOST);
-
 export const AppDataSource = new DataSource({
   type: 'postgres',
   host: process.env.DB_HOST || 'localhost',

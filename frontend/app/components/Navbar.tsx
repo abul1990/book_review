@@ -6,16 +6,13 @@ import {
   Typography,
   Button,
   IconButton,
-  Switch,
   Box,
   Link,
-  useTheme,
 } from '@mui/material';
 import {
   DarkMode,
   Home,
   LightMode,
-  Menu as MenuIcon,
 } from '@mui/icons-material';
 import { usePathname, useRouter } from 'next/navigation';
 import { useThemeContext } from './CustomThemeProvider';

@@ -85,7 +85,7 @@ const ReviewsPage = observer(() => {
     return (
       <>
         <Typography variant="h6" gutterBottom>
-          {loggedInUser?.name}, You haven't added any reviews.
+          {loggedInUser?.name + ", You haven't added any reviews."}
         </Typography>
         <Typography variant="body1">
           Start reviewing your favorite{' '}
