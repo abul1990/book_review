@@ -1,8 +1,9 @@
 import { Book } from 'src/books/entities/books.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 
 @Entity('reviews')
+@Unique(['user', 'book']) 
 export class Review {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -13,7 +14,7 @@ export class Review {
   @Column({ length: 500 })
   comment: string;
 
-  @Column({ type: 'date' })
+  @Column({ type: 'timestamp' })
   createdAt: Date;
 
   @ManyToOne(() => Book, (book) => book.reviews, { onDelete: 'CASCADE' })  

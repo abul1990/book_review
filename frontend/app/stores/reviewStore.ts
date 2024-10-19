@@ -29,7 +29,9 @@ class ReviewStore {
   async fetchReviewsByBook(bookId: string) {
     this.loading = true;
     try {
-      const response = await apiClient.get<Review[]>(`/books/${bookId}/reviews`);
+      const response = await apiClient.get<Review[]>(
+        `/books/${bookId}/reviews`
+      );
       runInAction(() => {
         this.reviews = response.data;
       });
@@ -39,6 +41,32 @@ class ReviewStore {
       runInAction(() => {
         this.loading = false;
       });
+    }
+  }
+
+  sortReviews(option: string) {
+    switch (option) {
+      case 'newest':
+        this.reviews = this.reviews.slice().sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateB - dateA;
+        });
+        break;
+
+      case 'oldest':
+        this.reviews = this.reviews.slice().sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+          return dateA - dateB;
+        });
+        break;
+      case 'rating_asc':
+        this.reviews = this.reviews.slice().sort((a, b) => a.rating - b.rating);
+        break;
+      case 'rating_desc':
+        this.reviews = this.reviews.slice().sort((a, b) => b.rating - a.rating);
+        break;
     }
   }
 
@@ -58,7 +86,8 @@ class ReviewStore {
       await apiClient.patch(`/reviews/${id}`, updatedReview);
       runInAction(() => {
         const index = this.reviews.findIndex((review) => review.id === id);
-        if (index !== -1) this.reviews[index] = { ...this.reviews[index], ...updatedReview };
+        if (index !== -1)
+          this.reviews[index] = { ...this.reviews[index], ...updatedReview };
       });
     } catch (error) {
       console.error('Error updating review:', error);

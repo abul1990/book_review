@@ -32,6 +32,20 @@ export class AuthService {
     throw new UnauthorizedException('Invalid credentials');
   }
 
+  async validateToken(token: string): Promise<any> {
+    try {
+      const payload = this.jwtService.verify(token, {
+        secret: process.env.JWT_SECRET || 'secret',
+      });
+      if (payload) {
+        return { isValid: true };
+      } else return { isValid: false };
+    } catch (err) {
+      console.error('Token validation error:', err.message);
+      throw new UnauthorizedException('Invalid or expired token');
+    }
+  }
+
   private async generateJwtToken(user: any) {
     const payload = { email: user.email, role: user.role };
     return {
@@ -40,8 +54,8 @@ export class AuthService {
         id: user.id,
         email: user.email,
         name: user.name,
-        role: user.role, 
-      }
+        role: user.role,
+      },
     };
   }
 }

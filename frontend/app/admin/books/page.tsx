@@ -92,16 +92,17 @@ const BookManagementPage = observer(() => {
       <Grid container spacing={2}>
         {bookStore.books.map((book) => (
           <Grid item xs={12} sm={6} md={4} key={book.id}>
-            <Card sx={{ display: 'flex', flexDirection: 'row', padding: 1 }}>
+            <Card sx={{ height: 160, display: 'flex', flexDirection: 'row', padding: 1 }}>
               <Box
                 component="img"
                 src={book.coverUrl || defaultBookCoverUrl}
                 alt={book.title}
                 sx={{
-                  width: '150px',
+                  width: '120px',
                   height: 'auto',
                   borderRadius: '4px',
                   marginRight: '16px',
+                  objectFit: 'cover'
                 }}
               />
               <CardContent sx={{ flex: 1 }}>

@@ -71,7 +71,7 @@ const BooksPage = observer(() => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 padding: 1,
-                position: 'relative', // Make the card relative
+                position: 'relative',
               }}
               onClick={() => handleBookClick(book)}
               style={{ cursor: 'pointer' }}

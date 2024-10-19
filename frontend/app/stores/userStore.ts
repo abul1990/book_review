@@ -83,6 +83,15 @@ class UserStore {
     }
   }
 
+  async validateToken(token: string): Promise<boolean>  {
+    const response = await apiClient.post('/auth/validate-token', {token});
+    if(response.status === 200) {
+      const { isValid } = response.data;
+      return isValid;
+    }
+    return false;
+  }
+
   logout() {
     this.loggedInUser = null;
     if(typeof window !== 'undefined') {

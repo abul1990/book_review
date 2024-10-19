@@ -26,6 +26,7 @@ import { defaultBookCoverUrl, Review } from '../models/types';
 import { useAuth } from '../hooks/useAuth';
 import { formatDate } from '../utils/date-formatter';
 import { useRouter } from 'next/navigation';
+import SortReviews from '../components/SortReviews';
 
 const ReviewsPage = observer(() => {
   useAuth();
@@ -71,7 +72,7 @@ const ReviewsPage = observer(() => {
     return (
       book!.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book!.author.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      `${rating}` === searchQuery
+      `${rating}`.includes(searchQuery)
     );
   });
 
@@ -124,12 +125,14 @@ const ReviewsPage = observer(() => {
         sx={{ marginBottom: 4 }}
       />
 
+      <SortReviews/>
+
       {filteredReviews.length === 0 ? (
-        <Typography variant="body1">
+        <Typography variant="body1" sx={{marginTop: 2}}>
           No reviews found matching your search criteria.
         </Typography>
       ) : (
-        <Grid container spacing={3}>
+        <Grid container spacing={3} sx={{marginTop: 2}}>
           {filteredReviews.map((review: Review) => (
             <Grid item xs={12} key={review.id!}>
               <Card
