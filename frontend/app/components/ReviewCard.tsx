@@ -157,7 +157,7 @@ export default function ReviewCard({ review, isUserReview }: ReviewCardProps) {
             onChange={(e) =>
               setEditableReview((prev) => ({
                 ...prev,
-                comment: e.target.value,
+                comment: e.target.value?.trim(),
               }))
             }
             sx={{ marginTop: 2 }}

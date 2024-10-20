@@ -53,8 +53,8 @@ const ReviewsPage = observer(() => {
   }, [selectedBook]);
 
   const handleAddReview = async () => {
-    if(newReview.comment.length > 500) {
-      alert('Please share your thoughts in 500 chars')
+    if (newReview.comment.length > 500) {
+      alert('Please share your thoughts in 500 chars');
       return;
     }
     await reviewStore.addReview(newReview);
@@ -166,14 +166,14 @@ const ReviewsPage = observer(() => {
             fullWidth
             value={newReview.comment}
             onChange={(e) =>
-              setNewReview({ ...newReview, comment: e.target.value })
+              setNewReview({ ...newReview, comment: e.target.value?.trim() })
             }
             sx={{ marginBottom: 2 }}
-            inputProps={{maxLength: 500}}
+            inputProps={{ maxLength: 500 }}
           />
           <Button
             variant="contained"
-            disabled={!newReview.comment?.trim() || !newReview.rating}
+            disabled={!newReview.rating}
             onClick={handleAddReview}
           >
             Post Review

@@ -224,7 +224,7 @@ const ReviewsPage = observer(() => {
                       onChange={(e) =>
                         setEditableReview((prev) => ({
                           ...prev,
-                          comment: e.target.value,
+                          comment: e.target.value?.trim(),
                         }))
                       }
                       sx={{ marginTop: 2 }}

@@ -11,7 +11,7 @@ export class Review {
   @Column({ type: 'decimal', precision: 2, scale: 1 })
   rating: number; 
 
-  @Column({ length: 500 })
+  @Column({ length: 500, nullable: true })
   comment: string;
 
   @Column({ type: 'timestamp' })

@@ -9,7 +9,6 @@ export class ReviewRequestDto {
   @Max(5)
   rating: number;
 
-  @IsNotEmpty()
   @IsString()
   comment: string;
 
