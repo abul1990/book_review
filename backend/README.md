@@ -71,10 +71,37 @@ PORT=8080
 
 ### Database Setup
 
-Make sure PostgreSQL is running and execute the following commands to set up the database:
+Make sure PostgreSQL is running as a docker container or any where in the cloud
+
+Below commands are useful for running migration scripts
+
+Create Migration for all current entities
+```bash
+npx typeorm migration:generate -n CreateTables
+```
+
+Execute the created migrations
 
 ```bash
 npx typeorm migration:run
+```
+
+Note: Please be informed that current setup not using migration scripts. 
+However can enable with slight changes in data-source.ts file as follows.
+
+```ts
+export const AppDataSource = new DataSource({
+  type: 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  port: parseInt(process.env.DB_PORT, 10) || 5432,
+  username: process.env.DB_USERNAME || 'postgres',
+  password: process.env.DB_PASSWORD || 'password',
+  database: process.env.DB_DATABASE || 'book_reviews',
+  entities: [User, Book, Review],
+  synchronize: false, 
+  migrations: ["dist/migrations/*.js"],
+  logging: false,
+});
 ```
 
 ---
