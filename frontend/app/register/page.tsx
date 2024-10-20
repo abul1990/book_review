@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import {
   Box,
   Button,
@@ -18,7 +18,7 @@ const RegistrationPage: React.FC = () => {
   const theme = useTheme();
   const router = useRouter();
 
-  const [formData, setFormData] = useState<User>({
+  const [newUser, setNewUser] = useState<User>({
     name: '',
     email: '',
     password: '',
@@ -30,8 +30,30 @@ const RegistrationPage: React.FC = () => {
     password: '',
   });
 
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setNewUser({ ...newUser, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      const maxSize = 256 * 1024;
+
+      if (!validTypes.includes(file.type)) {
+        alert('Only JPG and PNG files are allowed.');
+        return;
+      }
+
+      if (file.size > maxSize) {
+        alert('File size must not exceed 256 KB.');
+        return;
+      }
+      setCoverFile(file);
+    }
   };
 
   const validateForm = () => {
@@ -43,16 +65,16 @@ const RegistrationPage: React.FC = () => {
     };
 
     const nameRegex = /^[A-Za-z\s]+$/;
-    if (!nameRegex.test(formData.name)) {
+    if (!nameRegex.test(newUser.name)) {
       newErrors.name = 'Name can only contain alphabets.';
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
+    if (!emailRegex.test(newUser.email)) {
       newErrors.email = 'Invalid email format.';
     }
 
-    if (!formData.password) {
+    if (!newUser.password) {
       newErrors.password = 'Password required';
     }
 
@@ -68,8 +90,15 @@ const RegistrationPage: React.FC = () => {
     }
 
     try {
-      const withRole = {...formData, role: 'user'}
-      const success = await userStore.registerUser(withRole);
+      const formData = new FormData();
+      formData.append('name', newUser.name);
+      formData.append('email', newUser.email);
+      formData.append('password', newUser.password);
+      formData.append('role', 'user');
+      if (coverFile) {
+        formData.append('userPic', coverFile);
+      }
+      const success = await userStore.registerUser(formData);
       if (success) {
         alert('User registered successfully!');
         router.push('/login');
@@ -115,7 +144,7 @@ const RegistrationPage: React.FC = () => {
               name="name"
               fullWidth
               onChange={handleChange}
-              value={formData.name}
+              value={newUser.name}
               size="small"
               error={!!errors.name}
               helperText={errors.name}
@@ -128,7 +157,7 @@ const RegistrationPage: React.FC = () => {
               name="email"
               fullWidth
               onChange={handleChange}
-              value={formData.email}
+              value={newUser.email}
               size="small"
               error={!!errors.email}
               helperText={errors.email}
@@ -142,11 +171,39 @@ const RegistrationPage: React.FC = () => {
               type="password"
               fullWidth
               onChange={handleChange}
-              value={formData.password}
+              value={newUser.password}
               size="small"
               error={!!errors.password}
               helperText={errors.password}
+              inputProps={{ maxLength: 20 }}
             />
+          </Grid>
+          <Grid item xs={12}>
+            <Grid container spacing={2} alignItems="center">
+              <Grid item xs={4}>
+                <Typography variant="body1">Profile Pic:</Typography>
+              </Grid>
+              <Grid item xs={8}>
+                <Button variant="contained" component="label">
+                  Upload File
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    hidden
+                  />
+                </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item>
+            <Typography
+              variant="caption"
+              color="secondary"
+              sx={{ fontSize: 10 }}
+            >
+              Allowed types: JPG, PNG. Max size: 256 KB.
+            </Typography>
           </Grid>
           <Grid item xs={12}>
             <Button variant="contained" fullWidth onClick={handleRegister}>

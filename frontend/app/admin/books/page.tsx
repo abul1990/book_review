@@ -84,8 +84,22 @@ const BookManagementPage = observer(() => {
   };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event?.target?.files?.[0]) {
-      setCoverFile(event.target.files[0]);
+    const file = event.target.files?.[0];
+
+    if (file) {
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+      const maxSize = 256 * 1024;
+
+      if (!validTypes.includes(file.type)) {
+        alert('Only JPG and PNG files are allowed.');
+        return;
+      }
+
+      if (file.size > maxSize) {
+        alert('File size must not exceed 256 KB.');
+        return;
+      }
+      setCoverFile(file);
     }
   };
 
@@ -212,19 +226,15 @@ const BookManagementPage = observer(() => {
                 </Grid>
               </Grid>
             </Grid>
-
-            {/* <Grid item xs={12}>
-              <TextField
-                label="Cover Url"
-                variant="outlined"
-                fullWidth
-                value={newBook.coverUrl}
-                onChange={(e) =>
-                  setNewBook({ ...newBook, coverUrl: e.target.value })
-                }
-                size="small"
-              />
-            </Grid> */}
+            <Grid item>
+            <Typography
+              variant="caption"
+              color="secondary"
+              sx={{ fontSize: 10 }}
+            >
+              Allowed types: JPG, PNG. Max size: 256 KB.
+            </Typography>
+          </Grid>
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center">
                 <Grid item xs={4}>

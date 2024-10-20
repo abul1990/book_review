@@ -166,7 +166,7 @@ const ReviewsPage = observer(() => {
             fullWidth
             value={newReview.comment}
             onChange={(e) =>
-              setNewReview({ ...newReview, comment: e.target.value?.trim() })
+              setNewReview({ ...newReview, comment: e.target.value })
             }
             sx={{ marginBottom: 2 }}
             inputProps={{ maxLength: 500 }}
