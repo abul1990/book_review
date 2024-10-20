@@ -149,6 +149,7 @@ const BookManagementPage = observer(() => {
                   marginRight: '16px',
                   objectFit: 'cover',
                 }}
+                onError={(e) => e.currentTarget.src = '/images/default-book-cover.png'}
               />
               <CardContent sx={{ flex: 1 }}>
                 <Typography variant="h6">{book.title}</Typography>

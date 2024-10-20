@@ -97,6 +97,7 @@ const ReviewsPage = observer(() => {
                   height: 'auto',
                   borderRadius: '4px',
                 }}
+                onError={(e) => e.currentTarget.src = '/images/default-book-cover.png'}
               />
             </Grid>
             <Grid item xs={12} sm={8}>

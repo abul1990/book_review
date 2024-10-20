@@ -38,7 +38,6 @@ export default function ReviewCard({ review, isUserReview }: ReviewCardProps) {
       alert('Please share your thoughts in 500 chars')
       return;
     }
-    console.log('editableReview => ', editableReview);
     await reviewStore.updateReview(reviewId, editableReview as Review);
     setIsEditing(false);
   };
@@ -80,6 +79,7 @@ export default function ReviewCard({ review, isUserReview }: ReviewCardProps) {
               borderRadius: '50%',
               marginRight: '10px',
             }}
+            onError={(e) => e.currentTarget.src = '/images/default-user.png'}
           />
           <Typography variant="h6" component="span" sx={{ fontWeight: 'bold' }}>
             {review.user?.name}

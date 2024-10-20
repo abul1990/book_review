@@ -154,6 +154,7 @@ const ReviewsPage = observer(() => {
                       : '/images/default-book-cover.png'
                   }
                   alt="Book cover"
+                  onError={(e) => e.currentTarget.src = '/images/default-book-cover.png'}
                 />
                 <Box sx={{ flex: 1 }}>
                   <CardContent sx={{ paddingBottom: 1 }}>

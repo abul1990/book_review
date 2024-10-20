@@ -87,6 +87,7 @@ const BooksPage = observer(() => {
                     : '/images/default-book-cover.png'
                 }
                 alt={`${book.title} cover`}
+                onError={(e) => e.currentTarget.src = '/images/default-book-cover.png'}
               />
 
               <CardContent sx={{ flex: 1, marginLeft: 2 }}>
