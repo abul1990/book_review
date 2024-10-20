@@ -83,7 +83,6 @@ export class ReviewsService {
         createdAt: 'DESC',
       },
     });
-    console.log('reviews => ', reviews);
     return reviews.map(this.toResponseDTO);
   }
 
@@ -95,7 +94,6 @@ export class ReviewsService {
         createdAt: 'DESC',
       },
     });
-    console.log('reviews => ', reviews);
     return reviews.map(this.toResponseDTO);
   }
 
@@ -136,7 +134,7 @@ export class ReviewsService {
   private toResponseDTO(review: Review): ReviewResponseDto {
     return {
       id: review.id,
-      rating: review.rating,
+      rating: Number(review.rating),
       comment: review.comment,
       createdAt: review.createdAt,
       bookId: review.book.id,

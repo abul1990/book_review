@@ -34,6 +34,11 @@ export default function ReviewCard({ review, isUserReview }: ReviewCardProps) {
   const [editableReview, setEditableReview] = useState<Partial<Review>>({});
 
   const handleSave = async (reviewId: string) => {
+    if(editableReview?.comment && editableReview?.comment?.length > 500) {
+      alert('Please share your thoughts in 500 chars')
+      return;
+    }
+    console.log('editableReview => ', editableReview);
     await reviewStore.updateReview(reviewId, editableReview as Review);
     setIsEditing(false);
   };
@@ -156,6 +161,7 @@ export default function ReviewCard({ review, isUserReview }: ReviewCardProps) {
               }))
             }
             sx={{ marginTop: 2 }}
+            inputProps={{ maxLength: 500 }}
           />
         ) : (
           <Typography sx={{ marginTop: 1 }}>{review.comment}</Typography>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import {
   Box,
@@ -83,8 +83,8 @@ const BookManagementPage = observer(() => {
     setModalOpen(true);
   };
 
-  const handleFileChange = (event: any) => {
-    if (event.target.files[0]) {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event?.target?.files?.[0]) {
       setCoverFile(event.target.files[0]);
     }
   };
@@ -212,6 +212,19 @@ const BookManagementPage = observer(() => {
                 </Grid>
               </Grid>
             </Grid>
+
+            {/* <Grid item xs={12}>
+              <TextField
+                label="Cover Url"
+                variant="outlined"
+                fullWidth
+                value={newBook.coverUrl}
+                onChange={(e) =>
+                  setNewBook({ ...newBook, coverUrl: e.target.value })
+                }
+                size="small"
+              />
+            </Grid> */}
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center">
                 <Grid item xs={4}>

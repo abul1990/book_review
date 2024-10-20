@@ -53,6 +53,10 @@ const ReviewsPage = observer(() => {
   }, [selectedBook]);
 
   const handleAddReview = async () => {
+    if(newReview.comment.length > 500) {
+      alert('Please share your thoughts in 500 chars')
+      return;
+    }
     await reviewStore.addReview(newReview);
     if (selectedBook?.id) {
       bookStore.refreshSelectedBook(selectedBook.id);
@@ -165,6 +169,7 @@ const ReviewsPage = observer(() => {
               setNewReview({ ...newReview, comment: e.target.value })
             }
             sx={{ marginBottom: 2 }}
+            inputProps={{maxLength: 500}}
           />
           <Button
             variant="contained"
