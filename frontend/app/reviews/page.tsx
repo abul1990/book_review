@@ -22,7 +22,7 @@ import {
 import { Save, Cancel, Search } from '@mui/icons-material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { defaultBookCoverUrl, Review } from '../models/types';
+import { Review } from '../models/types';
 import { useAuth } from '../hooks/useAuth';
 import { formatDate } from '../utils/date-formatter';
 import { useRouter } from 'next/navigation';
@@ -125,14 +125,14 @@ const ReviewsPage = observer(() => {
         sx={{ marginBottom: 4 }}
       />
 
-      <SortReviews/>
+      <SortReviews />
 
       {filteredReviews.length === 0 ? (
-        <Typography variant="body1" sx={{marginTop: 2}}>
+        <Typography variant="body1" sx={{ marginTop: 2 }}>
           No reviews found matching your search criteria.
         </Typography>
       ) : (
-        <Grid container spacing={3} sx={{marginTop: 2}}>
+        <Grid container spacing={3} sx={{ marginTop: 2 }}>
           {filteredReviews.map((review: Review) => (
             <Grid item xs={12} key={review.id!}>
               <Card
@@ -148,7 +148,11 @@ const ReviewsPage = observer(() => {
                 <CardMedia
                   component="img"
                   sx={{ width: 120, height: 160, marginRight: 2 }}
-                  image={review.book?.coverUrl || defaultBookCoverUrl}
+                  image={
+                    review.book?.coverUrl
+                      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${review.book.coverUrl}`
+                      : '/images/default-book-cover.png'
+                  }
                   alt="Book cover"
                 />
                 <Box sx={{ flex: 1 }}>

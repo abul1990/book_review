@@ -30,7 +30,6 @@ export default function ReviewCard({ review, isUserReview }: ReviewCardProps) {
     }
   );
 
-  // Local state for editing
   const [isEditing, setIsEditing] = useState(false);
   const [editableReview, setEditableReview] = useState<Partial<Review>>({});
 
@@ -65,7 +64,11 @@ export default function ReviewCard({ review, isUserReview }: ReviewCardProps) {
         <Box display="flex" alignItems="center" mb={2}>
           <Box
             component="img"
-            src={review.user?.coverPicUrl || 'https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-profile-picture-business-profile-woman-suitable-social-media-profiles-icons-screensavers-as-templatex9_719432-1328.jpg'}
+            src={
+              review.user?.coverPicUrl
+                ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${review.user?.coverPicUrl}`
+                : '/images/default-user.jpg'
+            }
             sx={{
               width: '40px',
               height: '40px',
@@ -73,17 +76,6 @@ export default function ReviewCard({ review, isUserReview }: ReviewCardProps) {
               marginRight: '10px',
             }}
           />
-
-          {/* <Image
-            src={review.user?.coverPicUrl ?? ''}
-            alt="review"
-            style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '50%',
-              marginRight: '10px',
-            }}
-          /> */}
           <Typography variant="h6" component="span" sx={{ fontWeight: 'bold' }}>
             {review.user?.name}
           </Typography>

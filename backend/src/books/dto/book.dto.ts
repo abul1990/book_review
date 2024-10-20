@@ -1,6 +1,10 @@
 import { IsNotEmpty, IsOptional, IsString, IsDateString } from 'class-validator';
 
 export class BookRequestDto {
+  @IsOptional()
+  @IsString()
+  id: string;
+
   @IsNotEmpty()
   @IsString()
   title: string;

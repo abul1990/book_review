@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useRouter } from 'next/navigation';
 import { bookStore } from '../stores/bookStore';
-import { Book, defaultBookCoverUrl } from '../models/types';
+import { Book } from '../models/types';
 import { useAuth } from '../hooks/useAuth';
 import { formatDate } from '../utils/date-formatter';
 import { Search } from '@mui/icons-material';
@@ -51,7 +51,9 @@ const BooksPage = observer(() => {
         variant="outlined"
         fullWidth
         value={searchQuery}
-        onChange={(e: React.ChangeEvent<HTMLInputElement> ) => setSearchQuery(e.target.value)}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          setSearchQuery(e.target.value)
+        }
         size="small"
         InputProps={{
           startAdornment: (
@@ -78,8 +80,12 @@ const BooksPage = observer(() => {
             >
               <CardMedia
                 component="img"
-                sx={{ width: 80, height: 120, objectFit: 'cover' }}
-                image={book?.coverUrl || defaultBookCoverUrl}
+                sx={{ width: 100, height: 120, objectFit: 'cover' }}
+                image={
+                  book.coverUrl
+                    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${book.coverUrl}`
+                    : '/images/default-book-cover.png'
+                }
                 alt={`${book.title} cover`}
               />
 

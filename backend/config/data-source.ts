@@ -16,5 +16,5 @@ export const AppDataSource = new DataSource({
   entities: [User, Book, Review],
   synchronize: true, 
 //   migrations: ["dist/migrations/*.js"],
-  logging: true,
+  logging: false,
 });

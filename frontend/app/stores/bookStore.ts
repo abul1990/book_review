@@ -28,9 +28,13 @@ class BookStore {
     }
   }
 
-  async addBook(newBook: Book) {
+  async addBook(formData: FormData) {
     try {
-      const response = await apiClient.post('/books', newBook);
+      const response = await apiClient.post('/books', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
       runInAction(() => {
         this.books.push(response.data);
       });
@@ -59,13 +63,20 @@ class BookStore {
     this.ratingDistribution = response.data;
   }
 
-  async updateBook(updatedBook: Book) {
+  async updateBook(bookId: string, updatedBook: FormData) {
     try {
-      await apiClient.put(`/books/${updatedBook.id}`, updatedBook);
+      console.log('updatedBook => ', updatedBook);
+      const response = await apiClient.put(`/books/${bookId}`, updatedBook, 
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
       runInAction(() => {
-        const index = this.books.findIndex((book) => book.id === updatedBook.id);
+        const index = this.books.findIndex((book) => book.id === bookId);
         if (index !== -1) {
-          this.books[index] = updatedBook;
+          this.books[index] = response.data;
         }
       });
     } catch (error) {

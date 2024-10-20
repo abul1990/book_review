@@ -16,9 +16,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  CardMedia,
 } from '@mui/material';
 import { bookStore } from '@/app/stores/bookStore';
-import { Book, defaultBookCoverUrl } from '@/app/models/types';
+import { Book } from '@/app/models/types';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import EditIcon from '@mui/icons-material/Edit';
@@ -30,9 +31,9 @@ const BookManagementPage = observer(() => {
     id: '',
     title: '',
     author: '',
-    coverUrl: '',
     publicationDate: dayjs(new Date()).format('YYYY-MM-DD'),
   });
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   useEffect(() => {
@@ -41,17 +42,29 @@ const BookManagementPage = observer(() => {
 
   const handleAddUpdateBook = async () => {
     if (!newBook.title || !newBook.author || !newBook.publicationDate) {
-      alert('Please fill out all required fields: Title, Author, and Publication Date.');
+      alert(
+        'Please fill out all required fields: Title, Author, and Publication Date.'
+      );
       return;
+    }
+    const formData = new FormData();
+    formData.append('title', newBook.title);
+    formData.append('author', newBook.author);
+    formData.append('publicationDate', newBook.publicationDate);
+
+    if (coverFile) {
+      formData.append('cover', coverFile);
     }
 
     if (newBook.id) {
-      await bookStore.updateBook(newBook);
+      formData.append('id', newBook.id);
+      await bookStore.updateBook(newBook.id, formData);
     } else {
-      await bookStore.addBook(newBook);
+      await bookStore.addBook(formData);
     }
     clearForm();
     setModalOpen(false);
+    await bookStore.fetchBooks();
   };
 
   const clearForm = () => {
@@ -62,11 +75,18 @@ const BookManagementPage = observer(() => {
       coverUrl: '',
       publicationDate: dayjs(new Date()).format('YYYY-MM-DD'),
     });
+    setCoverFile(null);
   };
 
   const handleEditBook = (book: Book) => {
     setNewBook(book);
     setModalOpen(true);
+  };
+
+  const handleFileChange = (event: any) => {
+    if (event.target.files[0]) {
+      setCoverFile(event.target.files[0]);
+    }
   };
 
   if (bookStore.loading)
@@ -92,23 +112,36 @@ const BookManagementPage = observer(() => {
       <Grid container spacing={2}>
         {bookStore.books.map((book) => (
           <Grid item xs={12} sm={6} md={4} key={book.id}>
-            <Card sx={{ height: 160, display: 'flex', flexDirection: 'row', padding: 1 }}>
-              <Box
+            <Card
+              sx={{
+                height: 160,
+                display: 'flex',
+                flexDirection: 'row',
+                padding: 1,
+              }}
+            >
+              <CardMedia
                 component="img"
-                src={book.coverUrl || defaultBookCoverUrl}
+                src={
+                  book.coverUrl
+                    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${book.coverUrl}`
+                    : '/images/default-book-cover.png'
+                }
                 alt={book.title}
                 sx={{
                   width: '120px',
                   height: 'auto',
                   borderRadius: '4px',
                   marginRight: '16px',
-                  objectFit: 'cover'
+                  objectFit: 'cover',
                 }}
               />
               <CardContent sx={{ flex: 1 }}>
                 <Typography variant="h6">{book.title}</Typography>
                 <Typography variant="subtitle1">{book.author}</Typography>
-                <Typography variant="body2">{`Published on: ${formatDate(book.publicationDate)}`}</Typography>
+                <Typography variant="body2">{`Published on: ${formatDate(
+                  book.publicationDate
+                )}`}</Typography>
                 <Box
                   sx={{
                     display: 'flex',
@@ -160,17 +193,24 @@ const BookManagementPage = observer(() => {
                 size="small"
               />
             </Grid>
+
             <Grid item xs={12}>
-              <TextField
-                label="Cover Url"
-                variant="outlined"
-                fullWidth
-                value={newBook.coverUrl}
-                onChange={(e) =>
-                  setNewBook({ ...newBook, coverUrl: e.target.value })
-                }
-                size="small"
-              />
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={4}>
+                  <Typography variant="body1">Book Cover:</Typography>
+                </Grid>
+                <Grid item xs={8}>
+                  <Button variant="contained" component="label">
+                    Upload File
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      hidden
+                    />
+                  </Button>
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item xs={12}>
               <Grid container spacing={2} alignItems="center">

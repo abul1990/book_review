@@ -10,12 +10,13 @@ import {
   TextField,
   Button,
   Rating,
+  CardMedia,
 } from '@mui/material';
 import { reviewStore } from '@/app/stores/reviewStore';
 import { bookStore } from '@/app/stores/bookStore';
 import RatingBars from '@/app/components/RatingBars';
 import ReviewCard from '@/app/components/ReviewCard';
-import { defaultBookCoverUrl, Review } from '@/app/models/types';
+import { Review } from '@/app/models/types';
 import { userStore } from '@/app/stores/userStore';
 import { useAuth } from '@/app/hooks/useAuth';
 import { formatDate } from '@/app/utils/date-formatter';
@@ -79,9 +80,13 @@ const ReviewsPage = observer(() => {
             sx={{ height: '100%' }}
           >
             <Grid item xs={12} sm={4}>
-              <Box
+              <CardMedia
                 component="img"
-                src={selectedBook.coverUrl || defaultBookCoverUrl}
+                src={
+                  selectedBook.coverUrl
+                    ? `${process.env.NEXT_PUBLIC_API_BASE_URL}${selectedBook.coverUrl}`
+                    : '/images/default-book-cover.png'
+                }
                 alt={selectedBook.title}
                 sx={{
                   width: '100%',
@@ -130,7 +135,7 @@ const ReviewsPage = observer(() => {
         <Typography variant="h5" gutterBottom>
           Customer Reviews
         </Typography>
-        <SortReviews/>
+        <SortReviews />
       </Box>
 
       {!userHasReviewed && (
